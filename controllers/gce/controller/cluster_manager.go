@@ -24,12 +24,12 @@ import (
 	compute "google.golang.org/api/compute/v1"
 	gce "k8s.io/kubernetes/pkg/cloudprovider/providers/gce"
 
-	"k8s.io/ingress/controllers/gce/backends"
-	"k8s.io/ingress/controllers/gce/firewalls"
-	"k8s.io/ingress/controllers/gce/healthchecks"
-	"k8s.io/ingress/controllers/gce/instances"
-	"k8s.io/ingress/controllers/gce/loadbalancers"
-	"k8s.io/ingress/controllers/gce/utils"
+	"github.com/wy2745/ingress/controllers/gce/backends"
+	"github.com/wy2745/ingress/controllers/gce/firewalls"
+	"github.com/wy2745/ingress/controllers/gce/healthchecks"
+	"github.com/wy2745/ingress/controllers/gce/instances"
+	"github.com/wy2745/ingress/controllers/gce/loadbalancers"
+	"github.com/wy2745/ingress/controllers/gce/utils"
 )
 
 const (

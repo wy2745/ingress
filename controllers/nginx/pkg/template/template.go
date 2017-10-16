@@ -35,11 +35,11 @@ import (
 
 	extensions "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/ingress/controllers/nginx/pkg/config"
-	"k8s.io/ingress/core/pkg/ingress"
-	"k8s.io/ingress/core/pkg/ingress/annotations/ratelimit"
-	ing_net "k8s.io/ingress/core/pkg/net"
-	"k8s.io/ingress/core/pkg/watch"
+	"github.com/wy2745/ingress/controllers/nginx/pkg/config"
+	"github.com/wy2745/ingress/core/pkg/ingress"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/ratelimit"
+	ing_net "github.com/wy2745/ingress/core/pkg/net"
+	"github.com/wy2745/ingress/core/pkg/watch"
 )
 
 const (

@@ -26,7 +26,7 @@ import (
 
 	"fmt"
 
-	"k8s.io/ingress/core/pkg/ingress/defaults"
+	"github.com/wy2745/ingress/core/pkg/ingress/defaults"
 )
 
 func buildIngress() *extensions.Ingress {

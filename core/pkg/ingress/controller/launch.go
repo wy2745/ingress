@@ -23,8 +23,8 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
-	"k8s.io/ingress/core/pkg/ingress"
-	"k8s.io/ingress/core/pkg/k8s"
+	"github.com/wy2745/ingress/core/pkg/ingress"
+	"github.com/wy2745/ingress/core/pkg/k8s"
 )
 
 // NewIngressController returns a configured Ingress controller
@@ -182,6 +182,7 @@ func NewIngressController(backend ingress.Controller) *GenericController {
 		UpdateStatus:            *updateStatus,
 		ElectionID:              *electionID,
 		Client:                  kubeClient,
+		//需要注意的是这里的时间，需要探究更新时间带来的影响，默认是10min
 		ResyncPeriod:            *resyncPeriod,
 		DefaultService:          *defaultSvc,
 		IngressClass:            *ingressClass,
@@ -200,6 +201,7 @@ func NewIngressController(backend ingress.Controller) *GenericController {
 		SortBackends:            *sortBackends,
 	}
 
+	//使用已有的配置来建立一个新的ingress controller
 	ic := newIngressController(config)
 	go registerHandlers(*profiling, *healthzPort, ic)
 	return ic

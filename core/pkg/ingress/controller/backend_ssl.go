@@ -26,8 +26,8 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/cache"
 
-	"k8s.io/ingress/core/pkg/ingress"
-	"k8s.io/ingress/core/pkg/net/ssl"
+	"github.com/wy2745/ingress/core/pkg/ingress"
+	"github.com/wy2745/ingress/core/pkg/net/ssl"
 )
 
 // syncSecret keeps in sync Secrets used by Ingress rules with the files on

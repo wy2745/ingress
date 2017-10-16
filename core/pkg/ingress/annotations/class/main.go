@@ -20,8 +20,8 @@ import (
 	"github.com/golang/glog"
 	extensions "k8s.io/api/extensions/v1beta1"
 
-	"k8s.io/ingress/core/pkg/ingress/annotations/parser"
-	"k8s.io/ingress/core/pkg/ingress/errors"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/parser"
+	"github.com/wy2745/ingress/core/pkg/ingress/errors"
 )
 
 const (

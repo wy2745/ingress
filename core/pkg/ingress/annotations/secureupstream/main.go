@@ -22,8 +22,8 @@ import (
 	"github.com/pkg/errors"
 	extensions "k8s.io/api/extensions/v1beta1"
 
-	"k8s.io/ingress/core/pkg/ingress/annotations/parser"
-	"k8s.io/ingress/core/pkg/ingress/resolver"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/parser"
+	"github.com/wy2745/ingress/core/pkg/ingress/resolver"
 )
 
 const (

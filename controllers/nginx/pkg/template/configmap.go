@@ -26,8 +26,8 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 
-	"k8s.io/ingress/controllers/nginx/pkg/config"
-	ing_net "k8s.io/ingress/core/pkg/net"
+	"github.com/wy2745/ingress/controllers/nginx/pkg/config"
+	ing_net "github.com/wy2745/ingress/core/pkg/net"
 )
 
 const (

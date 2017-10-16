@@ -29,6 +29,7 @@ func main() {
 	// start a new nginx controller
 	ngx := newNGINXController()
 
+	//用来接收终止信号
 	go handleSigterm(ngx)
 	// start the controller
 	ngx.Start()
@@ -42,7 +43,9 @@ func main() {
 
 func handleSigterm(ngx *NGINXController) {
 	signalChan := make(chan os.Signal, 1)
+	//一旦有程序终止的信号，就会传送到signalChan
 	signal.Notify(signalChan, syscall.SIGTERM)
+	//等待程序终止的信号
 	<-signalChan
 	glog.Infof("Received SIGTERM, shutting down")
 

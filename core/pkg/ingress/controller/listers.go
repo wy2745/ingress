@@ -28,9 +28,32 @@ import (
 	"k8s.io/client-go/tools/cache"
 	fcache "k8s.io/client-go/tools/cache/testing"
 
-	"k8s.io/ingress/core/pkg/ingress/annotations/class"
-	"k8s.io/ingress/core/pkg/ingress/annotations/parser"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/class"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/parser"
 )
+
+//添加辅助函数
+type StoreToIngressLister struct {
+	cache.Store
+}
+func (ic *GenericController) getIngressesForService(svc *apiv1.Service) []extensions.Ingress {
+	ings, err := ic.listers.Ingress.GetServiceIngress(svc)
+	if err != nil {
+		glog.V(3).Infof("ignoring service %v: %v", svc.Name, err)
+		return nil
+	}
+	return ings
+}
+
+func (ic *GenericController) enqueueIngressForService(svc *apiv1.Service) {
+	ings := ic.getIngressesForService(svc)
+	for _, ing := range ings {
+		if !!class.IsValid(&ing, ic.cfg.IngressClass, ic.cfg.DefaultIngressClass) {
+			continue
+		}
+		ic.syncQueue.Enqueue(&ing)
+	}
+}
 
 func (ic *GenericController) createListers(disableNodeLister bool) {
 	// from here to the end of the method all the code is just boilerplate
@@ -88,6 +111,44 @@ func (ic *GenericController) createListers(disableNodeLister bool) {
 			}
 
 			ic.syncQueue.Enqueue(cur)
+		},
+	}
+
+	//在这里做出service和endpoint的改动
+
+
+	svcHandlers := cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			addSvc := obj.(*apiv1.Service)
+			glog.Infof("Adding service: %v", addSvc.Name)
+			ic.recorder.Eventf(addSvc, apiv1.EventTypeNormal, "CREATE", fmt.Sprintf("Service %s/%s", addSvc.Namespace, addSvc.Name))
+			ic.enqueueIngressForService(addSvc)
+		},
+		DeleteFunc: func(obj interface{}) {
+			remSvc, isSvc := obj.(*apiv1.Service)
+			if !isSvc {
+				deletedState, ok := obj.(cache.DeletedFinalStateUnknown)
+				if !ok {
+					glog.Infof("Error received unexpected object: %v", obj)
+					return
+				}
+				remSvc, ok = deletedState.Obj.(*apiv1.Service)
+				if !ok {
+					glog.Infof("Error DeletedFinalStateUnknown contained non-Service object: %v", deletedState.Obj)
+					return
+				}
+			}
+			glog.Infof("Removing service: %v", remSvc.Name)
+			ic.recorder.Eventf(remSvc, apiv1.EventTypeNormal, "DELETE", fmt.Sprintf("Ingress %s/%s", remSvc.Namespace, remSvc.Name))
+			ic.enqueueIngressForService(remSvc)
+		},
+		UpdateFunc: func(old, cur interface{}) {
+			if !reflect.DeepEqual(old, cur) {
+				glog.Infof("Service %v changed, syncing",
+					cur.(*apiv1.Service).Name)
+				ic.recorder.Eventf(cur.(*apiv1.Service), apiv1.EventTypeNormal, "UPDATE", fmt.Sprintf("Ingress %s/%s", cur.(*apiv1.Service).Namespace, cur.(*apiv1.Service).Name))
+				ic.enqueueIngressForService(cur.(*apiv1.Service))
+			}
 		},
 	}
 
@@ -163,10 +224,14 @@ func (ic *GenericController) createListers(disableNodeLister bool) {
 		},
 	}
 
+
+
 	watchNs := apiv1.NamespaceAll
 	if ic.cfg.ForceNamespaceIsolation && ic.cfg.Namespace != apiv1.NamespaceAll {
 		watchNs = ic.cfg.Namespace
 	}
+
+	//更新间隔时间在这里生效了，每个lister都是在固定的时间间隔内获取数据
 
 	ic.listers.Ingress.Store, ic.ingController = cache.NewInformer(
 		cache.NewListWatchFromClient(ic.cfg.Client.ExtensionsV1beta1().RESTClient(), "ingresses", ic.cfg.Namespace, fields.Everything()),
@@ -184,9 +249,12 @@ func (ic *GenericController) createListers(disableNodeLister bool) {
 		cache.NewListWatchFromClient(ic.cfg.Client.CoreV1().RESTClient(), "configmaps", watchNs, fields.Everything()),
 		&apiv1.ConfigMap{}, ic.cfg.ResyncPeriod, mapEventHandler)
 
+	//ic.listers.Service.Store, ic.svcController = cache.NewInformer(
+	//	cache.NewListWatchFromClient(ic.cfg.Client.CoreV1().RESTClient(), "services", ic.cfg.Namespace, fields.Everything()),
+	//	&apiv1.Service{}, ic.cfg.ResyncPeriod, cache.ResourceEventHandlerFuncs{})
 	ic.listers.Service.Store, ic.svcController = cache.NewInformer(
 		cache.NewListWatchFromClient(ic.cfg.Client.CoreV1().RESTClient(), "services", ic.cfg.Namespace, fields.Everything()),
-		&apiv1.Service{}, ic.cfg.ResyncPeriod, cache.ResourceEventHandlerFuncs{})
+		&apiv1.Service{}, ic.cfg.ResyncPeriod, svcHandlers)
 
 	var nodeListerWatcher cache.ListerWatcher
 	if disableNodeLister {

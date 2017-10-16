@@ -28,10 +28,10 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/kubernetes/pkg/api"
 
-	"k8s.io/ingress/core/pkg/ingress/annotations/class"
-	"k8s.io/ingress/core/pkg/ingress/store"
-	"k8s.io/ingress/core/pkg/k8s"
-	"k8s.io/ingress/core/pkg/task"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/class"
+	"github.com/wy2745/ingress/core/pkg/ingress/store"
+	"github.com/wy2745/ingress/core/pkg/k8s"
+	"github.com/wy2745/ingress/core/pkg/task"
 )
 
 func buildLoadBalancerIngressByIP() []apiv1.LoadBalancerIngress {

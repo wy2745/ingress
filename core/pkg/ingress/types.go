@@ -26,17 +26,18 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apiserver/pkg/server/healthz"
 
-	"k8s.io/ingress/core/pkg/ingress/annotations/auth"
-	"k8s.io/ingress/core/pkg/ingress/annotations/authreq"
-	"k8s.io/ingress/core/pkg/ingress/annotations/authtls"
-	"k8s.io/ingress/core/pkg/ingress/annotations/ipwhitelist"
-	"k8s.io/ingress/core/pkg/ingress/annotations/proxy"
-	"k8s.io/ingress/core/pkg/ingress/annotations/ratelimit"
-	"k8s.io/ingress/core/pkg/ingress/annotations/redirect"
-	"k8s.io/ingress/core/pkg/ingress/annotations/rewrite"
-	"k8s.io/ingress/core/pkg/ingress/defaults"
-	"k8s.io/ingress/core/pkg/ingress/resolver"
-	"k8s.io/ingress/core/pkg/ingress/store"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/auth"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/authreq"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/authtls"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/ipwhitelist"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/proxy"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/ratelimit"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/redirect"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/rewrite"
+	"github.com/wy2745/ingress/core/pkg/ingress/defaults"
+	"github.com/wy2745/ingress/core/pkg/ingress/resolver"
+	"github.com/wy2745/ingress/core/pkg/ingress/store"
+	"fmt"
 )
 
 var (
@@ -114,6 +115,8 @@ type StoreLister struct {
 	Secret    store.SecretLister
 	ConfigMap store.ConfigMapLister
 }
+
+
 
 // BackendInfo returns information about the backend.
 // This fields contains information that helps to track issues or to

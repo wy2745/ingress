@@ -27,8 +27,8 @@ import (
 	testclient "k8s.io/client-go/kubernetes/fake"
 	cache_client "k8s.io/client-go/tools/cache"
 
-	"k8s.io/ingress/core/pkg/ingress"
-	"k8s.io/ingress/core/pkg/ingress/store"
+	"github.com/wy2745/ingress/core/pkg/ingress"
+	"github.com/wy2745/ingress/core/pkg/ingress/store"
 	"k8s.io/kubernetes/pkg/api"
 )
 

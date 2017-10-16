@@ -38,14 +38,14 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	extensions "k8s.io/api/extensions/v1beta1"
 
-	"k8s.io/ingress/controllers/nginx/pkg/config"
-	ngx_template "k8s.io/ingress/controllers/nginx/pkg/template"
-	"k8s.io/ingress/controllers/nginx/pkg/version"
-	"k8s.io/ingress/core/pkg/ingress"
-	"k8s.io/ingress/core/pkg/ingress/controller"
-	"k8s.io/ingress/core/pkg/ingress/defaults"
-	"k8s.io/ingress/core/pkg/net/dns"
-	"k8s.io/ingress/core/pkg/net/ssl"
+	"github.com/wy2745/ingress/controllers/nginx/pkg/config"
+	ngx_template "github.com/wy2745/ingress/controllers/nginx/pkg/template"
+	"github.com/wy2745/ingress/controllers/nginx/pkg/version"
+	"github.com/wy2745/ingress/core/pkg/ingress"
+	"github.com/wy2745/ingress/core/pkg/ingress/controller"
+	"github.com/wy2745/ingress/core/pkg/ingress/defaults"
+	"github.com/wy2745/ingress/core/pkg/net/dns"
+	"github.com/wy2745/ingress/core/pkg/net/ssl"
 )
 
 type statusModule string
@@ -155,6 +155,7 @@ type NGINXController struct {
 func (n *NGINXController) Start() {
 	n.isShuttingDown = false
 
+	//启动了一个新的ingress controller
 	n.controller = controller.NewIngressController(n)
 	go n.controller.Start()
 
@@ -480,6 +481,8 @@ func (n *NGINXController) UpdateIngressStatus(*extensions.Ingress) []apiv1.LoadB
 // write the configuration file
 // returning nill implies the backend will be reloaded.
 // if an error is returned means requeue the update
+
+//很关键，nginx重启载入更新的配置文件的函数
 func (n *NGINXController) OnUpdate(ingressCfg ingress.Configuration) error {
 	cfg := ngx_template.ReadConfig(n.configmap.Data)
 	cfg.Resolver = n.resolver

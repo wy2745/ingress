@@ -24,7 +24,7 @@ import (
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
-	"k8s.io/ingress/core/pkg/ingress/defaults"
+	"github.com/wy2745/ingress/core/pkg/ingress/defaults"
 )
 
 func buildIngress() *extensions.Ingress {

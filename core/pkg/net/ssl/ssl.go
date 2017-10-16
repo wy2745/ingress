@@ -37,8 +37,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"k8s.io/ingress/core/pkg/file"
-	"k8s.io/ingress/core/pkg/ingress"
+	"github.com/wy2745/ingress/core/pkg/file"
+	"github.com/wy2745/ingress/core/pkg/ingress"
 )
 
 var (

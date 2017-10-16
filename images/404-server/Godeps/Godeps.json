@@ -1,5 +1,5 @@
 {
-	"ImportPath": "k8s.io/ingress/images/404-server",
+	"ImportPath": "github.com/wy2745/ingress/images/404-server",
 	"GoVersion": "go1.8",
 	"GodepVersion": "v79",
 	"Packages": [

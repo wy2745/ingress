@@ -21,11 +21,43 @@ import (
 
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/cache"
+	extensions "k8s.io/api/extensions/v1beta1"
 )
 
 // IngressLister makes a Store that lists Ingress.
 type IngressLister struct {
 	cache.Store
+}
+
+//为IngressLister添加一个辅助函数
+// GetServiceIngress gets all the Ingress' that have rules pointing to a service.
+// Note that this ignores services without the right nodePorts.
+func (s *IngressLister) GetServiceIngress(svc *apiv1.Service) (ings []extensions.Ingress, err error) {
+	for _, m := range s.Store.List() {
+		ing := *m.(*extensions.Ingress)
+		if ing.Namespace != svc.Namespace {
+			continue
+		}
+		if ing.Spec.Backend != nil {
+			if ing.Spec.Backend.ServiceName == svc.Name {
+				ings = append(ings, ing)
+			}
+		}
+		for _, rules := range ing.Spec.Rules {
+			if rules.IngressRuleValue.HTTP == nil {
+				continue
+			}
+			for _, p := range rules.IngressRuleValue.HTTP.Paths {
+				if p.Backend.ServiceName == svc.Name {
+					ings = append(ings, ing)
+				}
+			}
+		}
+	}
+	if len(ings) == 0 {
+		err = fmt.Errorf("No ingress for service %v", svc.Name)
+	}
+	return
 }
 
 // SecretsLister makes a Store that lists Secrets.

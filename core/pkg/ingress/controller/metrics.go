@@ -19,7 +19,7 @@ package controller
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	"k8s.io/ingress/core/pkg/ingress"
+	"github.com/wy2745/ingress/core/pkg/ingress"
 )
 
 const (

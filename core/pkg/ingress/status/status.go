@@ -39,11 +39,11 @@ import (
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/client-go/tools/record"
 
-	"k8s.io/ingress/core/pkg/ingress/annotations/class"
-	"k8s.io/ingress/core/pkg/ingress/store"
-	"k8s.io/ingress/core/pkg/k8s"
-	ingress_strings "k8s.io/ingress/core/pkg/strings"
-	"k8s.io/ingress/core/pkg/task"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/class"
+	"github.com/wy2745/ingress/core/pkg/ingress/store"
+	"github.com/wy2745/ingress/core/pkg/k8s"
+	ingress_strings "github.com/wy2745/ingress/core/pkg/strings"
+	"github.com/wy2745/ingress/core/pkg/task"
 )
 
 const (

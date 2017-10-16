@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/ingress/controllers/gce/utils"
+	"github.com/wy2745/ingress/controllers/gce/utils"
 )
 
 func TestSyncFirewallPool(t *testing.T) {

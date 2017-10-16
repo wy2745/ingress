@@ -27,8 +27,8 @@ import (
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/ingress/controllers/gce/backends"
-	"k8s.io/ingress/controllers/gce/utils"
+	"github.com/wy2745/ingress/controllers/gce/backends"
+	"github.com/wy2745/ingress/controllers/gce/utils"
 )
 
 // Pods created in loops start from this time, for routines that

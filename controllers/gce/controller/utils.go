@@ -40,9 +40,9 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 
-	"k8s.io/ingress/controllers/gce/backends"
-	"k8s.io/ingress/controllers/gce/loadbalancers"
-	"k8s.io/ingress/controllers/gce/utils"
+	"github.com/wy2745/ingress/controllers/gce/backends"
+	"github.com/wy2745/ingress/controllers/gce/loadbalancers"
+	"github.com/wy2745/ingress/controllers/gce/utils"
 )
 
 const (

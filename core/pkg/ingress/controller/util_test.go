@@ -20,14 +20,14 @@ import (
 	"reflect"
 	"testing"
 
-	"k8s.io/ingress/core/pkg/ingress"
-	"k8s.io/ingress/core/pkg/ingress/annotations/auth"
-	"k8s.io/ingress/core/pkg/ingress/annotations/authreq"
-	"k8s.io/ingress/core/pkg/ingress/annotations/ipwhitelist"
-	"k8s.io/ingress/core/pkg/ingress/annotations/proxy"
-	"k8s.io/ingress/core/pkg/ingress/annotations/ratelimit"
-	"k8s.io/ingress/core/pkg/ingress/annotations/redirect"
-	"k8s.io/ingress/core/pkg/ingress/annotations/rewrite"
+	"github.com/wy2745/ingress/core/pkg/ingress"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/auth"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/authreq"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/ipwhitelist"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/proxy"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/ratelimit"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/redirect"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/rewrite"
 )
 
 type fakeError struct{}

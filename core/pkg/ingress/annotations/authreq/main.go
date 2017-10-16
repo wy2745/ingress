@@ -23,8 +23,8 @@ import (
 
 	extensions "k8s.io/api/extensions/v1beta1"
 
-	"k8s.io/ingress/core/pkg/ingress/annotations/parser"
-	ing_errors "k8s.io/ingress/core/pkg/ingress/errors"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/parser"
+	ing_errors "github.com/wy2745/ingress/core/pkg/ingress/errors"
 )
 
 const (

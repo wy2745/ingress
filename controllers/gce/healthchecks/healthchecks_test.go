@@ -22,7 +22,7 @@ import (
 
 	compute "google.golang.org/api/compute/v1"
 
-	"k8s.io/ingress/controllers/gce/utils"
+	"github.com/wy2745/ingress/controllers/gce/utils"
 )
 
 func TestHealthCheckAdd(t *testing.T) {

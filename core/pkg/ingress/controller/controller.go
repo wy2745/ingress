@@ -43,18 +43,18 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/flowcontrol"
 
-	"k8s.io/ingress/core/pkg/ingress"
-	"k8s.io/ingress/core/pkg/ingress/annotations/class"
-	"k8s.io/ingress/core/pkg/ingress/annotations/healthcheck"
-	"k8s.io/ingress/core/pkg/ingress/annotations/parser"
-	"k8s.io/ingress/core/pkg/ingress/annotations/proxy"
-	"k8s.io/ingress/core/pkg/ingress/defaults"
-	"k8s.io/ingress/core/pkg/ingress/resolver"
-	"k8s.io/ingress/core/pkg/ingress/status"
-	"k8s.io/ingress/core/pkg/k8s"
-	"k8s.io/ingress/core/pkg/net/ssl"
-	local_strings "k8s.io/ingress/core/pkg/strings"
-	"k8s.io/ingress/core/pkg/task"
+	"github.com/wy2745/ingress/core/pkg/ingress"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/class"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/healthcheck"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/parser"
+	"github.com/wy2745/ingress/core/pkg/ingress/annotations/proxy"
+	"github.com/wy2745/ingress/core/pkg/ingress/defaults"
+	"github.com/wy2745/ingress/core/pkg/ingress/resolver"
+	"github.com/wy2745/ingress/core/pkg/ingress/status"
+	"github.com/wy2745/ingress/core/pkg/k8s"
+	"github.com/wy2745/ingress/core/pkg/net/ssl"
+	local_strings "github.com/wy2745/ingress/core/pkg/strings"
+	"github.com/wy2745/ingress/core/pkg/task"
 )
 
 const (
@@ -172,6 +172,7 @@ func newIngressController(config *Configuration) *GenericController {
 
 	ic.syncQueue = task.NewTaskQueue(ic.syncIngress)
 
+	//对event，ingress等建立了lister
 	ic.createListers(config.DisableNodeList)
 
 	if config.UpdateStatus {
@@ -299,6 +300,7 @@ func (ic *GenericController) syncIngress(key interface{}) error {
 	pcfg := ingress.Configuration{
 		Backends:            upstreams,
 		Servers:             servers,
+		//这里会获取service相应的endpoint更新到配置文件里面去
 		TCPEndpoints:        ic.getStreamServices(ic.cfg.TCPConfigMapName, apiv1.ProtocolTCP),
 		UDPEndpoints:        ic.getStreamServices(ic.cfg.UDPConfigMapName, apiv1.ProtocolUDP),
 		PassthroughBackends: passUpstreams,

@@ -24,7 +24,7 @@ import (
 
 	"github.com/golang/glog"
 
-	"k8s.io/ingress/controllers/gce/utils"
+	"github.com/wy2745/ingress/controllers/gce/utils"
 )
 
 const (
