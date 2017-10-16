@@ -1,4 +1,4 @@
-all: push
+#all: push
 
 BUILDTAGS=
 
@@ -7,7 +7,7 @@ TAG?=0.9.0-beta.13
 REGISTRY?=gcr.io/google_containers
 GOOS?=linux
 #DOCKER?=gcloud docker --
-DOCKER?=docker
+DOCKER?=sudo docker
 SED_I?=sed -i
 GOHOSTOS ?= $(shell go env GOHOSTOS)
 
@@ -27,7 +27,8 @@ ARCH ?= $(shell go env GOARCH)
 GOARCH = ${ARCH}
 DUMB_ARCH = ${ARCH}
 
-ALL_ARCH = amd64 arm arm64 ppc64le
+#ALL_ARCH = amd64 arm arm64 ppc64le
+ALL_ARCH = amd64
 
 QEMUVERSION=v2.9.1
 
@@ -64,12 +65,12 @@ all: all-container
 sub-container-%:
 	$(MAKE) ARCH=$* build container
 
-sub-push-%:
-	$(MAKE) ARCH=$* push
+#sub-push-%:
+#	$(MAKE) ARCH=$* push
 
 all-container: $(addprefix sub-container-,$(ALL_ARCH))
 
-all-push: $(addprefix sub-push-,$(ALL_ARCH))
+#all-push: $(addprefix sub-push-,$(ALL_ARCH))
 
 container: .container-$(ARCH)
 .container-$(ARCH):
@@ -85,7 +86,8 @@ else
 	# When cross-building, only the placeholder "CROSS_BUILD_" should be removed
 	# Register /usr/bin/qemu-ARCH-static as the handler for ARM binaries in the kernel
 	$(DOCKER) run --rm --privileged multiarch/qemu-user-static:register --reset
-	curl -sSL https://github.com/multiarch/qemu-user-static/releases/download/$(QEMUVERSION)/x86_64_qemu-$(QEMUARCH)-static.tar.gz | tar -xz -C $(TEMP_DIR)/rootfs
+	#curl -sSL https://github.com/multiarch/qemu-user-static/releases/download/$(QEMUVERSION)/x86_64_qemu-$(QEMUARCH)-static.tar.gz | tar -xz -C $(TEMP_DIR)/rootfs
+	cp ~/qemu-arm-static $(TEMP_DIR)/rootfs/
 	$(SED_I) "s/CROSS_BUILD_//g" $(DOCKERFILE)
 endif
 
@@ -96,12 +98,12 @@ ifeq ($(ARCH), amd64)
 	$(DOCKER) tag $(MULTI_ARCH_IMG):$(TAG) $(IMAGE):$(TAG)
 endif
 
-push: .push-$(ARCH)
-.push-$(ARCH):
-	$(DOCKER) push $(MULTI_ARCH_IMG):$(TAG)
-ifeq ($(ARCH), amd64)
-	$(DOCKER) push $(IMAGE):$(TAG)
-endif
+#push: .push-$(ARCH)
+#.push-$(ARCH):
+#	$(DOCKER) push $(MULTI_ARCH_IMG):$(TAG)
+#ifeq ($(ARCH), amd64)
+#	$(DOCKER) push $(IMAGE):$(TAG)
+#endif
 
 clean:
       sudo $(DOCKER) rmi -f $(MULTI_ARCH_IMG):$(TAG) || true
@@ -133,5 +135,5 @@ vet:
 	@echo "+ $@"
 	@go vet $(shell go list ${PKG}/... | grep -v vendor)
 
-release: all-container all-push
+release: all-container #all-push
 	echo "done"
