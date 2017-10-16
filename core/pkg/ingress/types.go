@@ -37,7 +37,7 @@ import (
 	"github.com/wy2745/ingress/core/pkg/ingress/defaults"
 	"github.com/wy2745/ingress/core/pkg/ingress/resolver"
 	"github.com/wy2745/ingress/core/pkg/ingress/store"
-	"fmt"
+	//"fmt"
 )
 
 var (

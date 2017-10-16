@@ -7,7 +7,7 @@ TAG?=0.9.0-beta.13
 REGISTRY?=gcr.io/google_containers
 GOOS?=linux
 #DOCKER?=gcloud docker --
-DOCKER?=docker --
+DOCKER?=docker
 SED_I?=sed -i
 GOHOSTOS ?= $(shell go env GOHOSTOS)
 
@@ -21,7 +21,7 @@ ifndef COMMIT
   COMMIT := git-$(shell git rev-parse --short HEAD)
 endif
 
-PKG=wy2745/ingress/controllers/nginx
+PKG=github.com/wy2745/ingress/controllers/nginx
 
 ARCH ?= $(shell go env GOARCH)
 GOARCH = ${ARCH}
@@ -104,7 +104,7 @@ ifeq ($(ARCH), amd64)
 endif
 
 clean:
-	$(DOCKER) rmi -f $(MULTI_ARCH_IMG):$(TAG) || true
+      sudo $(DOCKER) rmi -f $(MULTI_ARCH_IMG):$(TAG) || true
 
 build: clean
 	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -a -installsuffix cgo \
