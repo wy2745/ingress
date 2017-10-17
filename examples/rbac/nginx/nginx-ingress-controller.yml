@@ -4,7 +4,7 @@ metadata:
   name: nginx-ingress-controller
   namespace: nginx-ingress 
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
         k8s-app: nginx-ingress-lb
@@ -13,6 +13,7 @@ spec:
       labels:
         k8s-app: nginx-ingress-lb
     spec:
+      nodeName: ist-master
       serviceAccountName: nginx-ingress-serviceaccount
       containers:
         - name: nginx-ingress-controller
