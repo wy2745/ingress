@@ -55,6 +55,10 @@ import (
 	"github.com/wy2745/ingress/core/pkg/net/ssl"
 	local_strings "github.com/wy2745/ingress/core/pkg/strings"
 	"github.com/wy2745/ingress/core/pkg/task"
+	"k8s.io/heapster/metrics/sources"
+	"k8s.io/heapster/metrics/core"
+	"k8s.io/heapster/common/flags"
+	"net/url"
 )
 
 const (
@@ -63,6 +67,8 @@ const (
 	rootLocation    = "/"
 
 	fakeCertificate = "default-fake-certificate"
+
+
 )
 
 var (
@@ -115,6 +121,11 @@ type GenericController struct {
 	forceReload int32
 
 	initialSyncDone int32
+
+	//为了方便获取负载加入的变量
+	sourceManager *core.MetricsSource
+
+	dataProcessors []core.DataProcessor
 }
 
 // Configuration contains all the settings required by an Ingress controller
@@ -158,6 +169,9 @@ func newIngressController(config *Configuration) *GenericController {
 		Interface: config.Client.CoreV1().Events(config.Namespace),
 	})
 
+	//需要在这里建立新的sourceManager和dataProcessors
+	sourceManager := createSourceManagerOrDie()
+
 	ic := GenericController{
 		cfg:             config,
 		stopLock:        &sync.Mutex{},
@@ -196,6 +210,42 @@ func newIngressController(config *Configuration) *GenericController {
 	cloner.RegisterDeepCopyFunc(ingress.GetGeneratedDeepCopyFuncs)
 
 	return &ic
+}
+func createSourceProvider(config *Configuration){
+	sourceFactory := sources.NewSourceFactory()
+}
+func (ic *GenericController)NewKubeletProvider() (core.MetricsSourceProvider, error) {
+	// create clients
+	kubeConfig, kubeletConfig, err := ic.cfg
+
+	if err != nil {
+		return nil, err
+	}
+	kubeClient := kube_client.NewForConfigOrDie(kubeConfig)
+	kubeletClient, err := NewKubeletClient(kubeletConfig)
+
+
+
+	return &kubeletProvider{
+		nodeLister:    ic.listers.Node,
+		reflector:     reflector,
+		kubeletClient: kubeletClient,
+	}, nil
+}
+func createSourceManagerOrDie(src flags.Uris) core.MetricsSource {
+	if len(src) != 1 {
+		glog.Fatal("Wrong number of sources specified")
+	}
+	sourceFactory := sources.NewSourceFactory()
+	sourceProvider, err := sourceFactory.BuildAll(src)
+	if err != nil {
+		glog.Fatalf("Failed to create source provide: %v", err)
+	}
+	sourceManager, err := sources.NewSourceManager(sourceProvider, sources.DefaultMetricsScrapeTimeout)
+	if err != nil {
+		glog.Fatalf("Failed to create source manager: %v", err)
+	}
+	return sourceManager
 }
 
 // Info returns information about the backend
@@ -608,6 +658,7 @@ func (ic *GenericController) getBackendServers(ingresses []*extensions.Ingress) 
 						// check if the location contains endpoints and a custom default backend
 						if location.DefaultBackend != nil {
 							sp := location.DefaultBackend.Spec.Ports[0]
+							//获取endpoint的部分，修改权重需要从这里入手
 							endps := ic.getEndpoints(location.DefaultBackend, &sp, apiv1.ProtocolTCP, &healthcheck.Upstream{})
 							if len(endps) > 0 {
 								glog.V(3).Infof("using custom default backend in server %v location %v (service %v/%v)",
