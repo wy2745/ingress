@@ -201,6 +201,17 @@ func (r *Reflector) Run(stopCh <-chan struct{}) {
 	}, r.period, stopCh)
 }
 
+// Run starts a watch and handles watch events. Will restart the watch if it is closed.
+// Run starts a goroutine and returns immediately.
+func (r *Reflector) RunV2() {
+	glog.V(3).Infof("Starting reflector %v (%s) from %s", r.expectedType, r.resyncPeriod, r.name)
+	go wait.Until(func() {
+		if err := r.ListAndWatch(wait.NeverStop); err != nil {
+			utilruntime.HandleError(err)
+		}
+	}, r.period, wait.NeverStop)
+}
+
 var (
 	// nothing will ever be sent down this channel
 	neverExitWatch <-chan time.Time = make(chan time.Time)

@@ -22,14 +22,20 @@ import (
 
 	"github.com/golang/glog"
 
+	"k8s.io/client-go/listers/core/v1"
 	apiv1 "k8s.io/api/core/v1"
 	extensions "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/tools/cache"
+	//kube_api "k8s.io/client-go/pkg/api/v1"
 	fcache "k8s.io/client-go/tools/cache/testing"
 
 	"github.com/wy2745/ingress/core/pkg/ingress/annotations/class"
 	"github.com/wy2745/ingress/core/pkg/ingress/annotations/parser"
+	"time"
+	"net/url"
+	"k8s.io/heapster/metrics/core"
+	"k8s.io/heapster/metrics/processors"
 )
 
 //添加辅助函数
@@ -113,9 +119,6 @@ func (ic *GenericController) createListers(disableNodeLister bool) {
 			ic.syncQueue.Enqueue(cur)
 		},
 	}
-
-	//在这里做出service和endpoint的改动
-
 
 	svcHandlers := cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
@@ -262,7 +265,18 @@ func (ic *GenericController) createListers(disableNodeLister bool) {
 	} else {
 		nodeListerWatcher = cache.NewListWatchFromClient(ic.cfg.Client.CoreV1().RESTClient(), "nodes", apiv1.NamespaceAll, fields.Everything())
 	}
+
 	ic.listers.Node.Store, ic.nodeController = cache.NewInformer(
 		nodeListerWatcher,
 		&apiv1.Node{}, ic.cfg.ResyncPeriod, cache.ResourceEventHandlerFuncs{})
+	ic.listers.NodeReflector = cache.NewReflector(nodeListerWatcher, &apiv1.Node{}, ic.listers.Node.Store, time.Hour)
+	ic.listers.NodeReflector.RunV2()
+
+	lw := cache.NewListWatchFromClient(ic.cfg.Client.CoreV1().RESTClient(), "pods", apiv1.NamespaceAll, fields.Everything())
+	store := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	ic.listers.Pod = v1.NewPodLister(store)
+	ic.listers.PodReflector = cache.NewReflector(lw, &apiv1.Pod{}, store, time.Hour)
+	ic.listers.PodReflector.RunV2()
+
+
 }

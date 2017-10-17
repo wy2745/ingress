@@ -22,12 +22,19 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
+	kubelet_client "k8s.io/heapster/metrics/sources/kubelet/util"
+	"k8s.io/heapster/metrics/sources/kubelet"
 
 	"github.com/wy2745/ingress/core/pkg/ingress"
 	"github.com/wy2745/ingress/core/pkg/k8s"
 )
+const(
+	defaultKubeletPort        = 10255
+	defaultKubeletHttps       = false
+)
 
 // NewIngressController returns a configured Ingress controller
+//需要在这个函数里面进行改造，以使得能够复用heapster代码获取负载
 func NewIngressController(backend ingress.Controller) *GenericController {
 	var (
 		flags = pflag.NewFlagSet("", pflag.ExitOnError)
@@ -120,7 +127,10 @@ func NewIngressController(backend ingress.Controller) *GenericController {
 		glog.Fatalf("Please specify --default-backend-service")
 	}
 
-	kubeClient, err := createApiserverClient(*apiserverHost, *kubeConfigFile)
+	//获取kubeClient,根据heapster要求，需要新建一个kubelet Client
+	kubeClient,kubeletClient, err := createApiserverClient(*apiserverHost, *kubeConfigFile)
+
+
 	if err != nil {
 		handleFatalInitError(err)
 	}
@@ -182,6 +192,7 @@ func NewIngressController(backend ingress.Controller) *GenericController {
 		UpdateStatus:            *updateStatus,
 		ElectionID:              *electionID,
 		Client:                  kubeClient,
+		KubeletClient:			 kubeletClient,
 		//需要注意的是这里的时间，需要探究更新时间带来的影响，默认是10min
 		ResyncPeriod:            *resyncPeriod,
 		DefaultService:          *defaultSvc,
@@ -280,10 +291,11 @@ func buildConfigFromFlags(masterURL, kubeconfigPath string) (*rest.Config, error
 //
 // apiserverHost param is in the format of protocol://address:port/pathPrefix, e.g.http://localhost:8001.
 // kubeConfig location of kubeconfig file
-func createApiserverClient(apiserverHost string, kubeConfig string) (*kubernetes.Clientset, error) {
+//对这个函数进行改造，使得可以返回kubeletClient
+func createApiserverClient(apiserverHost string, kubeConfig string) (*kubernetes.Clientset,*kubelet.KubeletClient, error) {
 	cfg, err := buildConfigFromFlags(apiserverHost, kubeConfig)
 	if err != nil {
-		return nil, err
+		return nil,nil, err
 	}
 
 	cfg.QPS = defaultQPS
@@ -294,18 +306,37 @@ func createApiserverClient(apiserverHost string, kubeConfig string) (*kubernetes
 
 	client, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
-		return nil, err
+		return nil,nil, err
 	}
 
 	v, err := client.Discovery().ServerVersion()
 	if err != nil {
-		return nil, err
+		return nil,nil, err
 	}
 
 	glog.Infof("Running in Kubernetes Cluster version v%v.%v (%v) - git (%v) commit %v - platform %v",
 		v.Major, v.Minor, v.GitVersion, v.GitTreeState, v.GitCommit, v.Platform)
 
-	return client, nil
+
+	//尝试创建kubeletClient
+	kubeletPort := defaultKubeletPort
+
+	kubeletHttps := defaultKubeletHttps
+
+	glog.Infof("Using Kubernetes client with master %q and version %+v\n", cfg.Host, cfg.GroupVersion)
+	glog.Infof("Using kubelet port %d", kubeletPort)
+
+	kubeletConfig := &kubelet_client.KubeletClientConfig{
+		Port:            uint(kubeletPort),
+		EnableHttps:     kubeletHttps,
+		TLSClientConfig: cfg.TLSClientConfig,
+		BearerToken:     cfg.BearerToken,
+	}
+	kubeletClient, err := kubelet.NewKubeletClient(kubeletConfig)
+	if err != nil {
+		return nil,nil, err
+	}
+	return client,kubeletClient, nil
 }
 
 /**

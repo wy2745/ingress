@@ -20,8 +20,11 @@ import (
 	"fmt"
 
 	apiv1 "k8s.io/api/core/v1"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/tools/cache"
 	extensions "k8s.io/api/extensions/v1beta1"
+	"k8s.io/apimachinery/pkg/labels"
 )
 
 // IngressLister makes a Store that lists Ingress.
@@ -114,6 +117,27 @@ func (sl *ServiceLister) GetByName(name string) (*apiv1.Service, error) {
 // NodeLister makes a Store that lists Nodes.
 type NodeLister struct {
 	cache.Store
+}
+
+// List lists all Nodes in the indexer.
+func (s *NodeLister) List(selector labels.Selector) (ret []*apiv1.Node, err error) {
+	err = cache.ListAll(s.Store, selector, func(m interface{}) {
+		ret = append(ret, m.(*apiv1.Node))
+	})
+	return ret, err
+}
+
+// Get retrieves the Node from the index for a given name.
+func (s *NodeLister) Get(name string) (*apiv1.Node, error) {
+	key := &apiv1.Node{ObjectMeta: meta_v1.ObjectMeta{Name: name}}
+	obj, exists, err := s.Store.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, errors.NewNotFound(apiv1.Resource("node"), name)
+	}
+	return obj.(*apiv1.Node), nil
 }
 
 // EndpointLister makes a Store that lists Endpoints.

@@ -68,6 +68,9 @@ type Cluster struct {
 	// InsecureSkipTLSVerify skips the validity check for the server's certificate. This will make your HTTPS connections insecure.
 	// +optional
 	InsecureSkipTLSVerify bool `json:"insecure-skip-tls-verify,omitempty"`
+	// APIVersion is the preferred api version for communicating with the kubernetes cluster (v1, v2, etc).
+	// +optional
+	APIVersion string `json:"api-version,omitempty"`
 	// CertificateAuthority is the path to a cert file for the certificate authority.
 	// +optional
 	CertificateAuthority string `json:"certificate-authority,omitempty"`

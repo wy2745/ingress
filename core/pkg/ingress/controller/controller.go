@@ -30,7 +30,9 @@ import (
 
 	"github.com/golang/glog"
 
-	apiv1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/listers/core/v1"
+	kube_api "k8s.io/api/core/v1"
+	cadvisor "github.com/google/cadvisor/info/v1"
 	extensions "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -57,8 +59,12 @@ import (
 	"github.com/wy2745/ingress/core/pkg/task"
 	"k8s.io/heapster/metrics/sources"
 	"k8s.io/heapster/metrics/core"
-	"k8s.io/heapster/common/flags"
-	"net/url"
+	"k8s.io/heapster/metrics/sources/kubelet"
+	"github.com/wy2745/ingress/core/pkg/ingress/store"
+	//kube_api "k8s.io/client-go/pkg/api/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"github.com/prometheus/client_golang/prometheus"
+	"k8s.io/heapster/metrics/processors"
 )
 
 const (
@@ -67,9 +73,16 @@ const (
 	rootLocation    = "/"
 
 	fakeCertificate = "default-fake-certificate"
+	infraContainerName = "POD"
+	// TODO: following constants are copied from k8s, change to use them directly
+	kubernetesPodNameLabel      = "io.kubernetes.pod.name"
+	kubernetesPodNamespaceLabel = "io.kubernetes.pod.namespace"
+	kubernetesPodUID            = "io.kubernetes.pod.uid"
+	kubernetesContainerLabel    = "io.kubernetes.container.name"
 
 
 )
+
 
 var (
 	// list of ports that cannot be used by TCP or UDP services
@@ -79,7 +92,19 @@ var (
 	fakeCertificateSHA  = ""
 
 	cloner = conversion.NewCloner()
+	// The Kubelet request latencies in microseconds.
+	kubeletRequestLatency = prometheus.NewSummaryVec(
+		prometheus.SummaryOpts{
+			Namespace: "heapster",
+			Subsystem: "kubelet",
+			Name:      "request_duration_microseconds",
+			Help:      "The Kubelet request latencies in microseconds.",
+		},
+		[]string{"node"},
+	)
 )
+
+
 
 // GenericController holds the boilerplate code required to build an Ingress controlller.
 type GenericController struct {
@@ -91,6 +116,8 @@ type GenericController struct {
 	nodeController cache.Controller
 	secrController cache.Controller
 	mapController  cache.Controller
+
+
 
 	listers *ingress.StoreLister
 
@@ -123,7 +150,7 @@ type GenericController struct {
 	initialSyncDone int32
 
 	//为了方便获取负载加入的变量
-	sourceManager *core.MetricsSource
+	sourceManager core.MetricsSource
 
 	dataProcessors []core.DataProcessor
 }
@@ -131,6 +158,7 @@ type GenericController struct {
 // Configuration contains all the settings required by an Ingress controller
 type Configuration struct {
 	Client clientset.Interface
+	KubeletClient *kubelet.KubeletClient
 
 	ResyncPeriod   time.Duration
 	DefaultService string
@@ -160,6 +188,274 @@ type Configuration struct {
 	SortBackends           bool
 }
 
+type kubeletProvider struct {
+	nodeLister    store.NodeLister
+	reflector     *cache.Reflector
+	kubeletClient *kubelet.KubeletClient
+}
+// Kubelet-provided metrics for pod and system container.
+type kubeletMetricsSource struct {
+	host          kubelet.Host
+	kubeletClient *kubelet.KubeletClient
+	nodename      string
+	hostname      string
+	hostId        string
+}
+func (this *kubeletMetricsSource) Name() string {
+	return this.String()
+}
+
+func (this *kubeletMetricsSource) String() string {
+	return fmt.Sprintf("kubelet:%s:%d", this.host.IP, this.host.Port)
+}
+
+func (this *kubeletMetricsSource) handleSystemContainer(c *cadvisor.ContainerInfo, cMetrics *core.MetricSet) string {
+	glog.V(8).Infof("Found system container %v with labels: %+v", c.Name, c.Spec.Labels)
+	cName := c.Name
+	if strings.HasPrefix(cName, "/") {
+		cName = cName[1:]
+	}
+	cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypeSystemContainer
+	cMetrics.Labels[core.LabelContainerName.Key] = cName
+	return core.NodeContainerKey(this.nodename, cName)
+}
+
+func (this *kubeletMetricsSource) handleKubernetesContainer(cName, ns, podName string, c *cadvisor.ContainerInfo, cMetrics *core.MetricSet) string {
+	var metricSetKey string
+	if cName == infraContainerName {
+		metricSetKey = core.PodKey(ns, podName)
+		cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePod
+	} else {
+		metricSetKey = core.PodContainerKey(ns, podName, cName)
+		cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePodContainer
+		cMetrics.Labels[core.LabelContainerName.Key] = cName
+		cMetrics.Labels[core.LabelContainerBaseImage.Key] = c.Spec.Image
+	}
+	cMetrics.Labels[core.LabelPodId.Key] = c.Spec.Labels[kubernetesPodUID]
+	cMetrics.Labels[core.LabelPodName.Key] = podName
+	cMetrics.Labels[core.LabelNamespaceName.Key] = ns
+	// Needed for backward compatibility
+	cMetrics.Labels[core.LabelPodNamespace.Key] = ns
+	return metricSetKey
+}
+func isNode(c *cadvisor.ContainerInfo) bool {
+	return c.Name == "/"
+}
+
+func (this *kubeletMetricsSource) decodeMetrics(c *cadvisor.ContainerInfo) (string, *core.MetricSet) {
+	if len(c.Stats) == 0 {
+		return "", nil
+	}
+
+	var metricSetKey string
+	cMetrics := &core.MetricSet{
+		CreateTime:   c.Spec.CreationTime,
+		ScrapeTime:   c.Stats[0].Timestamp,
+		MetricValues: map[string]core.MetricValue{},
+		Labels: map[string]string{
+			core.LabelNodename.Key: this.nodename,
+			core.LabelHostname.Key: this.hostname,
+			core.LabelHostID.Key:   this.hostId,
+		},
+		LabeledMetrics: []core.LabeledMetric{},
+	}
+
+	if isNode(c) {
+		metricSetKey =core.NodeKey(this.nodename)
+		cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypeNode
+	} else {
+		cName := c.Spec.Labels[kubernetesContainerLabel]
+		ns := c.Spec.Labels[kubernetesPodNamespaceLabel]
+		podName := c.Spec.Labels[kubernetesPodNameLabel]
+
+		// Support for kubernetes 1.0.*
+		if ns == "" && strings.Contains(podName, "/") {
+			tokens := strings.SplitN(podName, "/", 2)
+			if len(tokens) == 2 {
+				ns = tokens[0]
+				podName = tokens[1]
+			}
+		}
+		if cName == "" {
+			// Better this than nothing. This is a temporary hack for new heapster to work
+			// with Kubernetes 1.0.*.
+			// TODO: fix this with POD list.
+			// Parsing name like:
+			// k8s_kube-ui.7f9b83f6_kube-ui-v1-bxj1w_kube-system_9abfb0bd-811f-11e5-b548-42010af00002_e6841e8d
+			pos := strings.Index(c.Name, ".")
+			if pos >= 0 {
+				// remove first 4 chars.
+				cName = c.Name[len("k8s_"):pos]
+			}
+		}
+
+		// No Kubernetes metadata so treat this as a system container.
+		if cName == "" || ns == "" || podName == "" {
+			metricSetKey = this.handleSystemContainer(c, cMetrics)
+		} else {
+			metricSetKey = this.handleKubernetesContainer(cName, ns, podName, c, cMetrics)
+		}
+	}
+
+	for _, metric := range core.StandardMetrics {
+		if metric.HasValue != nil && metric.HasValue(&c.Spec) {
+			cMetrics.MetricValues[metric.Name] = metric.GetValue(&c.Spec, c.Stats[0])
+		}
+	}
+
+	for _, metric := range core.LabeledMetrics {
+		if metric.HasLabeledMetric != nil && metric.HasLabeledMetric(&c.Spec) {
+			labeledMetrics := metric.GetLabeledMetric(&c.Spec, c.Stats[0])
+			cMetrics.LabeledMetrics = append(cMetrics.LabeledMetrics, labeledMetrics...)
+		}
+	}
+
+	if c.Spec.HasCustomMetrics {
+	metricloop:
+		for _, spec := range c.Spec.CustomMetrics {
+			if cmValue, ok := c.Stats[0].CustomMetrics[spec.Name]; ok && cmValue != nil && len(cmValue) >= 1 {
+				newest := cmValue[0]
+				for _, metricVal := range cmValue {
+					if newest.Timestamp.Before(metricVal.Timestamp) {
+						newest = metricVal
+					}
+				}
+				mv := core.MetricValue{}
+				switch spec.Type {
+				case cadvisor.MetricGauge:
+					mv.MetricType = core.MetricGauge
+				case cadvisor.MetricCumulative:
+					mv.MetricType = core.MetricCumulative
+				default:
+					glog.V(4).Infof("Skipping %s: unknown custom metric type: %v", spec.Name, spec.Type)
+					continue metricloop
+				}
+
+				switch spec.Format {
+				case cadvisor.IntType:
+					mv.ValueType = core.ValueInt64
+					mv.IntValue = newest.IntValue
+				case cadvisor.FloatType:
+					mv.ValueType = core.ValueFloat
+					mv.FloatValue = float32(newest.FloatValue)
+				default:
+					glog.V(4).Infof("Skipping %s: unknown custom metric format", spec.Name, spec.Format)
+					continue metricloop
+				}
+
+				cMetrics.MetricValues[core.CustomMetricPrefix+spec.Name] = mv
+			}
+		}
+	}
+
+	return metricSetKey, cMetrics
+}
+
+func (this *kubeletMetricsSource) ScrapeMetrics(start, end time.Time) *core.DataBatch {
+	//这里是对container负载的获取
+	containers, err := this.scrapeKubelet(this.kubeletClient, this.host, start, end)
+	if err != nil {
+		glog.Errorf("error while getting containers from Kubelet: %v", err)
+	}
+	glog.V(2).Infof("successfully obtained stats for %v containers", len(containers))
+
+	result := &core.DataBatch{
+		Timestamp:  end,
+		MetricSets: map[string]*core.MetricSet{},
+	}
+	keys := make(map[string]bool)
+	for _, c := range containers {
+		name, metrics := this.decodeMetrics(&c)
+		if name == "" || metrics == nil {
+			continue
+		}
+		result.MetricSets[name] = metrics
+		keys[name] = true
+	}
+	return result
+}
+
+func (this *kubeletMetricsSource) scrapeKubelet(client *kubelet.KubeletClient, host kubelet.Host, start, end time.Time) ([]cadvisor.ContainerInfo, error) {
+	startTime := time.Now()
+	defer kubeletRequestLatency.WithLabelValues(this.hostname).Observe(float64(time.Since(startTime)))
+	return client.GetAllRawContainers(host, start, end)
+}
+
+func NewKubeletMetricsSource(host kubelet.Host, client *kubelet.KubeletClient, nodeName string, hostName string, hostId string) core.MetricsSource {
+	return &kubeletMetricsSource{
+		host:          host,
+		kubeletClient: client,
+		nodename:      nodeName,
+		hostname:      hostName,
+		hostId:        hostId,
+	}
+}
+func getNodeHostnameAndIP(node *kube_api.Node) (string, string, error) {
+	for _, c := range node.Status.Conditions {
+		if c.Type == kube_api.NodeReady && c.Status != kube_api.ConditionTrue {
+			return "", "", fmt.Errorf("Node %v is not ready", node.Name)
+		}
+	}
+	hostname, ip := node.Name, ""
+	for _, addr := range node.Status.Addresses {
+		if addr.Type == kube_api.NodeHostName && addr.Address != "" {
+			hostname = addr.Address
+		}
+		if addr.Type == kube_api.NodeInternalIP && addr.Address != "" {
+			if net.ParseIP(addr.Address).To4() != nil {
+				ip = addr.Address
+			}
+		}
+		if addr.Type == kube_api.NodeLegacyHostIP && addr.Address != "" && ip == "" {
+			ip = addr.Address
+		}
+	}
+	if ip != "" {
+		return hostname, ip, nil
+	}
+	return "", "", fmt.Errorf("Node %v has no valid hostname and/or IP address: %v %v", node.Name, hostname, ip)
+}
+func (this *kubeletProvider) GetMetricsSources() []core.MetricsSource {
+	sources := []core.MetricsSource{}
+	nodes, err := this.nodeLister.List(labels.Everything())
+	if err != nil {
+		glog.Errorf("error while listing nodes: %v", err)
+		return sources
+	}
+	if len(nodes) == 0 {
+		glog.Error("No nodes received from APIserver.")
+		return sources
+	}
+
+	nodeNames := make(map[string]bool)
+	for _, node := range nodes {
+		nodeNames[node.Name] = true
+		hostname, ip, err := getNodeHostnameAndIP(node)
+		if err != nil {
+			glog.Errorf("%v", err)
+			continue
+		}
+		sources = append(sources, NewKubeletMetricsSource(
+			kubelet.Host{IP: ip, Port: this.kubeletClient.GetPort()},
+			this.kubeletClient,
+			node.Name,
+			hostname,
+			node.Spec.ExternalID,
+		))
+	}
+	return sources
+}
+
+func (ic *GenericController)NewKubeletProvider() (core.MetricsSourceProvider, error) {
+
+
+	return &kubeletProvider{
+		nodeLister:    ic.listers.Node,
+		reflector:     ic.listers.NodeReflector,
+		kubeletClient: ic.cfg.KubeletClient,
+	}, nil
+}
+
 // newIngressController creates an Ingress controller
 func newIngressController(config *Configuration) *GenericController {
 
@@ -169,15 +465,14 @@ func newIngressController(config *Configuration) *GenericController {
 		Interface: config.Client.CoreV1().Events(config.Namespace),
 	})
 
-	//需要在这里建立新的sourceManager和dataProcessors
-	sourceManager := createSourceManagerOrDie()
+
 
 	ic := GenericController{
 		cfg:             config,
 		stopLock:        &sync.Mutex{},
 		stopCh:          make(chan struct{}),
 		syncRateLimiter: flowcontrol.NewTokenBucketRateLimiter(0.3, 1),
-		recorder: eventBroadcaster.NewRecorder(scheme.Scheme, apiv1.EventSource{
+		recorder: eventBroadcaster.NewRecorder(scheme.Scheme, kube_api.EventSource{
 			Component: "ingress-controller",
 		}),
 		sslCertTracker: newSSLCertTracker(),
@@ -188,6 +483,22 @@ func newIngressController(config *Configuration) *GenericController {
 
 	//对event，ingress等建立了lister
 	ic.createListers(config.DisableNodeList)
+	//在这里需要设定一个KubeletProvider以供负载的采集
+	kubeletProvider,err := ic.NewKubeletProvider()
+	if err != nil {
+		fmt.Println(err)
+	}
+	//需要在这里建立新的sourceManager和dataProcessors
+	ic.sourceManager, err = sources.NewSourceManager(kubeletProvider, sources.DefaultMetricsScrapeTimeout)
+	ic.dataProcessors = ic.createDataProcessorsOrDie(ic.listers.Pod)
+
+
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+
 
 	if config.UpdateStatus {
 		ic.syncStatus = status.NewStatusSyncer(status.Config{
@@ -211,47 +522,67 @@ func newIngressController(config *Configuration) *GenericController {
 
 	return &ic
 }
-func createSourceProvider(config *Configuration){
-	sourceFactory := sources.NewSourceFactory()
-}
-func (ic *GenericController)NewKubeletProvider() (core.MetricsSourceProvider, error) {
-	// create clients
-	kubeConfig, kubeletConfig, err := ic.cfg
 
+func (ic *GenericController)createDataProcessorsOrDie(podLister v1.PodLister) []core.DataProcessor {
+	dataProcessors := []core.DataProcessor{
+		// Convert cumulative to rate
+		processors.NewRateCalculator(core.RateMetricsMapping),
+	}
+
+	podBasedEnricher, err := processors.NewPodBasedEnricher(podLister)
 	if err != nil {
-		return nil, err
+		glog.Fatalf("Failed to create PodBasedEnricher: %v", err)
 	}
-	kubeClient := kube_client.NewForConfigOrDie(kubeConfig)
-	kubeletClient, err := NewKubeletClient(kubeletConfig)
+	dataProcessors = append(dataProcessors, podBasedEnricher)
 
-
-
-	return &kubeletProvider{
-		nodeLister:    ic.listers.Node,
-		reflector:     reflector,
-		kubeletClient: kubeletClient,
-	}, nil
-}
-func createSourceManagerOrDie(src flags.Uris) core.MetricsSource {
-	if len(src) != 1 {
-		glog.Fatal("Wrong number of sources specified")
-	}
-	sourceFactory := sources.NewSourceFactory()
-	sourceProvider, err := sourceFactory.BuildAll(src)
+	namespaceBasedEnricher, err := processors.NewNamespaceBasedEnricher(ic.cfg.Client)
 	if err != nil {
-		glog.Fatalf("Failed to create source provide: %v", err)
+		glog.Fatalf("Failed to create NamespaceBasedEnricher: %v", err)
 	}
-	sourceManager, err := sources.NewSourceManager(sourceProvider, sources.DefaultMetricsScrapeTimeout)
+	dataProcessors = append(dataProcessors, namespaceBasedEnricher)
+
+	// aggregators
+	metricsToAggregate := []string{
+		core.MetricCpuUsageRate.Name,
+		core.MetricMemoryUsage.Name,
+		core.MetricCpuRequest.Name,
+		core.MetricCpuLimit.Name,
+		core.MetricMemoryRequest.Name,
+		core.MetricMemoryLimit.Name,
+	}
+
+	metricsToAggregateForNode := []string{
+		core.MetricCpuRequest.Name,
+		core.MetricCpuLimit.Name,
+		core.MetricMemoryRequest.Name,
+		core.MetricMemoryLimit.Name,
+	}
+
+	dataProcessors = append(dataProcessors,
+		processors.NewPodAggregator(),
+		&processors.NamespaceAggregator{
+			MetricsToAggregate: metricsToAggregate,
+		},
+		&processors.NodeAggregator{
+			MetricsToAggregate: metricsToAggregateForNode,
+		},
+		&processors.ClusterAggregator{
+			MetricsToAggregate: metricsToAggregate,
+		})
+
+	nodeAutoscalingEnricher, err := processors.NewNodeAutoscalingEnricher(ic.listers.Node,ic.listers.NodeReflector)
 	if err != nil {
-		glog.Fatalf("Failed to create source manager: %v", err)
+		glog.Fatalf("Failed to create NodeAutoscalingEnricher: %v", err)
 	}
-	return sourceManager
+	dataProcessors = append(dataProcessors, nodeAutoscalingEnricher)
+	return dataProcessors
 }
 
 // Info returns information about the backend
 func (ic GenericController) Info() *ingress.BackendInfo {
 	return ic.cfg.Backend.Info()
 }
+
 
 // IngressClass returns information about the backend
 func (ic GenericController) IngressClass() string {
@@ -264,7 +595,7 @@ func (ic GenericController) GetDefaultBackend() defaults.Backend {
 }
 
 // GetPublishService returns the configured service used to set ingress status
-func (ic GenericController) GetPublishService() *apiv1.Service {
+func (ic GenericController) GetPublishService() *kube_api.Service {
 	s, err := ic.listers.Service.GetByName(ic.cfg.PublishService)
 	if err != nil {
 		return nil
@@ -279,12 +610,12 @@ func (ic GenericController) GetRecorder() record.EventRecorder {
 }
 
 // GetSecret searches for a secret in the local secrets Store
-func (ic GenericController) GetSecret(name string) (*apiv1.Secret, error) {
+func (ic GenericController) GetSecret(name string) (*kube_api.Secret, error) {
 	return ic.listers.Secret.GetByName(name)
 }
 
 // GetService searches for a service in the local secrets Store
-func (ic GenericController) GetService(name string) (*apiv1.Service, error) {
+func (ic GenericController) GetService(name string) (*kube_api.Service, error) {
 	return ic.listers.Service.GetByName(name)
 }
 
@@ -352,8 +683,8 @@ func (ic *GenericController) syncIngress(key interface{}) error {
 		Backends:            upstreams,
 		Servers:             servers,
 		//这里会获取service相应的endpoint更新到配置文件里面去
-		TCPEndpoints:        ic.getStreamServices(ic.cfg.TCPConfigMapName, apiv1.ProtocolTCP),
-		UDPEndpoints:        ic.getStreamServices(ic.cfg.UDPConfigMapName, apiv1.ProtocolUDP),
+		TCPEndpoints:        ic.getStreamServices(ic.cfg.TCPConfigMapName, kube_api.ProtocolTCP),
+		UDPEndpoints:        ic.getStreamServices(ic.cfg.UDPConfigMapName, kube_api.ProtocolUDP),
 		PassthroughBackends: passUpstreams,
 	}
 
@@ -381,7 +712,7 @@ func (ic *GenericController) syncIngress(key interface{}) error {
 	return nil
 }
 
-func (ic *GenericController) getStreamServices(configmapName string, proto apiv1.Protocol) []ingress.L4Service {
+func (ic *GenericController) getStreamServices(configmapName string, proto kube_api.Protocol) []ingress.L4Service {
 	glog.V(3).Infof("obtaining information about stream services of type %v located in configmap %v", proto, configmapName)
 	if configmapName == "" {
 		// no configmap configured
@@ -427,7 +758,7 @@ func (ic *GenericController) getStreamServices(configmapName string, proto apiv1
 		useProxyProtocol := false
 
 		// Proxy protocol is possible if the service is TCP
-		if len(nsSvcPort) == 3 && proto == apiv1.ProtocolTCP {
+		if len(nsSvcPort) == 3 && proto == kube_api.ProtocolTCP {
 			if strings.ToUpper(nsSvcPort[2]) == "PROXY" {
 				useProxyProtocol = true
 			}
@@ -450,7 +781,7 @@ func (ic *GenericController) getStreamServices(configmapName string, proto apiv1
 			continue
 		}
 
-		svc := svcObj.(*apiv1.Service)
+		svc := svcObj.(*kube_api.Service)
 
 		var endps []ingress.Endpoint
 		targetPort, err := strconv.Atoi(svcPort)
@@ -521,8 +852,8 @@ func (ic *GenericController) getDefaultUpstream() *ingress.Backend {
 		return upstream
 	}
 
-	svc := svcObj.(*apiv1.Service)
-	endps := ic.getEndpoints(svc, &svc.Spec.Ports[0], apiv1.ProtocolTCP, &healthcheck.Upstream{})
+	svc := svcObj.(*kube_api.Service)
+	endps := ic.getEndpoints(svc, &svc.Spec.Ports[0], kube_api.ProtocolTCP, &healthcheck.Upstream{})
 	if len(endps) == 0 {
 		glog.Warningf("service %v does not have any active endpoints", svcKey)
 		endps = []ingress.Endpoint{ic.cfg.Backend.DefaultEndpoint()}
@@ -659,7 +990,7 @@ func (ic *GenericController) getBackendServers(ingresses []*extensions.Ingress) 
 						if location.DefaultBackend != nil {
 							sp := location.DefaultBackend.Spec.Ports[0]
 							//获取endpoint的部分，修改权重需要从这里入手
-							endps := ic.getEndpoints(location.DefaultBackend, &sp, apiv1.ProtocolTCP, &healthcheck.Upstream{})
+							endps := ic.getEndpoints(location.DefaultBackend, &sp, kube_api.ProtocolTCP, &healthcheck.Upstream{})
 							if len(endps) > 0 {
 								glog.V(3).Infof("using custom default backend in server %v location %v (service %v/%v)",
 									server.Hostname, location.Path, location.DefaultBackend.Namespace, location.DefaultBackend.Name)
@@ -863,7 +1194,7 @@ func (ic *GenericController) getServiceClusterEndpoint(svcKey string, backend *e
 		return endpoint, fmt.Errorf("service %v does not exist", svcKey)
 	}
 
-	svc := svcObj.(*apiv1.Service)
+	svc := svcObj.(*kube_api.Service)
 	if svc.Spec.ClusterIP == "" {
 		return endpoint, fmt.Errorf("No ClusterIP found for service %s", svcKey)
 	}
@@ -892,7 +1223,7 @@ func (ic *GenericController) serviceEndpoints(svcKey, backendPort string,
 			servicePort.TargetPort.String() == backendPort ||
 			servicePort.Name == backendPort {
 
-			endps := ic.getEndpoints(svc, &servicePort, apiv1.ProtocolTCP, hz)
+			endps := ic.getEndpoints(svc, &servicePort, kube_api.ProtocolTCP, hz)
 			if len(endps) == 0 {
 				glog.Warningf("service %v does not have any active endpoints", svcKey)
 			}
@@ -1020,7 +1351,7 @@ func (ic *GenericController) createServers(data []*extensions.Ingress,
 						IsDefBackend: true,
 						Backend:      un,
 						Proxy:        ngxProxy,
-						Service:      &apiv1.Service{},
+						Service:      &kube_api.Service{},
 					},
 				},
 				SSLPassthrough: sslpt,
@@ -1115,9 +1446,9 @@ func (ic *GenericController) createServers(data []*extensions.Ingress,
 
 // getEndpoints returns a list of <endpoint ip>:<port> for a given service/target port combination.
 func (ic *GenericController) getEndpoints(
-	s *apiv1.Service,
-	servicePort *apiv1.ServicePort,
-	proto apiv1.Protocol,
+	s *kube_api.Service,
+	servicePort *kube_api.ServicePort,
+	proto kube_api.Protocol,
 	hz *healthcheck.Upstream) []ingress.Endpoint {
 
 	upsServers := []ingress.Endpoint{}
@@ -1131,7 +1462,7 @@ func (ic *GenericController) getEndpoints(
 	weight := 5
 
 	// ExternalName services
-	if s.Spec.Type == apiv1.ServiceTypeExternalName {
+	if s.Spec.Type == kube_api.ServiceTypeExternalName {
 		targetPort := servicePort.TargetPort.IntValue()
 		// check for invalid port value
 		if targetPort <= 0 {

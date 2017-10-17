@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/pflag"
 
 	apiv1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/listers/core/v1"
 	extensions "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apiserver/pkg/server/healthz"
@@ -38,6 +39,7 @@ import (
 	"github.com/wy2745/ingress/core/pkg/ingress/resolver"
 	"github.com/wy2745/ingress/core/pkg/ingress/store"
 	//"fmt"
+	"k8s.io/client-go/tools/cache"
 )
 
 var (
@@ -110,7 +112,11 @@ type Controller interface {
 type StoreLister struct {
 	Ingress   store.IngressLister
 	Service   store.ServiceLister
+	Pod 	  v1.PodLister
 	Node      store.NodeLister
+	//这里添加一个reflector
+	NodeReflector *cache.Reflector
+	PodReflector *cache.Reflector
 	Endpoint  store.EndpointLister
 	Secret    store.SecretLister
 	ConfigMap store.ConfigMapLister

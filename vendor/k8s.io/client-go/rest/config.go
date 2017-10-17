@@ -95,6 +95,9 @@ type Config struct {
 	// Transport, or http.DefaultTransport). The config may layer other RoundTrippers
 	// on top of the returned RoundTripper.
 	WrapTransport func(rt http.RoundTripper) http.RoundTripper
+	// Server should be accessed without verifying the TLS
+	// certificate. For testing only.
+	Insecure bool
 
 	// QPS indicates the maximum QPS to the master from this client.
 	// If it's zero, the created RESTClient will use DefaultQPS: 5

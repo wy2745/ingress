@@ -3541,6 +3541,7 @@ const (
 	NodeHostName    NodeAddressType = "Hostname"
 	NodeExternalIP  NodeAddressType = "ExternalIP"
 	NodeInternalIP  NodeAddressType = "InternalIP"
+	NodeLegacyHostIP NodeAddressType = "LegacyHostIP"
 	NodeExternalDNS NodeAddressType = "ExternalDNS"
 	NodeInternalDNS NodeAddressType = "InternalDNS"
 )
