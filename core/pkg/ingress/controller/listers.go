@@ -33,9 +33,9 @@ import (
 	"github.com/wy2745/ingress/core/pkg/ingress/annotations/class"
 	"github.com/wy2745/ingress/core/pkg/ingress/annotations/parser"
 	"time"
-	"net/url"
-	"k8s.io/heapster/metrics/core"
-	"k8s.io/heapster/metrics/processors"
+	//"net/url"
+	//"k8s.io/heapster/metrics/core"
+	//"k8s.io/heapster/metrics/processors"
 )
 
 //添加辅助函数
