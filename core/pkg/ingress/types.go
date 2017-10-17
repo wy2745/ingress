@@ -210,6 +210,9 @@ type Endpoint struct {
 	// of unsuccessful attempts to communicate with the server should happen
 	// to consider the endpoint unavailable
 	FailTimeout int `json:"failTimeout"`
+
+	//在这里添加一个权重，为后面的请求均衡做基础
+	Weight int `json:"weight"`
 	// Target returns a reference to the object providing the endpoint
 	Target *apiv1.ObjectReference `json:"target,omipempty"`
 }

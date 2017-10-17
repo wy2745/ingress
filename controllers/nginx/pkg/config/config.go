@@ -74,6 +74,8 @@ const (
 	// Default setting for load balancer algorithm
 	defaultLoadBalancerAlgorithm = "least_conn"
 
+	round_robinLoadBalancerAlgorithm = "round-robin"
+
 	// Parameters for a shared memory zone that will keep states for various keys.
 	// http://nginx.org/en/docs/http/ngx_http_limit_conn_module.html#limit_conn_zone
 	defaultLimitConnZoneVariable = "$binary_remote_addr"
@@ -455,6 +457,10 @@ func NewDefault() Configuration {
 	}
 
 	return cfg
+}
+
+func (cfg *Configuration) SwitchLoadBalanceAlgorithmToRB()  {
+	cfg.LoadBalanceAlgorithm = round_robinLoadBalancerAlgorithm
 }
 
 // BuildLogFormatUpstream format the log_format upstream using

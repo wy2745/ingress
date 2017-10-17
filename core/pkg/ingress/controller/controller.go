@@ -274,6 +274,7 @@ func (ic *GenericController) syncIngress(key interface{}) error {
 		ingresses = append(ingresses, ing)
 	}
 
+	//这一句是一个关键，会更新upstream和server
 	upstreams, servers := ic.getBackendServers(ingresses)
 	var passUpstreams []*ingress.SSLPassthroughBackend
 
@@ -1075,6 +1076,9 @@ func (ic *GenericController) getEndpoints(
 	// targetport.
 	adus := make(map[string]bool)
 
+	//随意加入一个weight
+	weight := 5
+
 	// ExternalName services
 	if s.Spec.Type == apiv1.ServiceTypeExternalName {
 		targetPort := servicePort.TargetPort.IntValue()
@@ -1096,6 +1100,8 @@ func (ic *GenericController) getEndpoints(
 			Port:        fmt.Sprintf("%v", targetPort),
 			MaxFails:    hz.MaxFails,
 			FailTimeout: hz.FailTimeout,
+			//在这里加入权重
+			Weight:		 weight,
 		})
 	}
 
@@ -1105,6 +1111,8 @@ func (ic *GenericController) getEndpoints(
 		glog.Warningf("unexpected error obtaining service endpoints: %v", err)
 		return upsServers
 	}
+
+
 
 	for _, ss := range ep.Subsets {
 		for _, epPort := range ss.Ports {
@@ -1137,6 +1145,8 @@ func (ic *GenericController) getEndpoints(
 					Port:        fmt.Sprintf("%v", targetPort),
 					MaxFails:    hz.MaxFails,
 					FailTimeout: hz.FailTimeout,
+					//在这里加入权重
+					Weight:		 weight,
 					Target:      epAddress.TargetRef,
 				}
 				upsServers = append(upsServers, ups)

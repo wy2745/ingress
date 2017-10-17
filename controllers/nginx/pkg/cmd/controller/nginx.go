@@ -486,6 +486,8 @@ func (n *NGINXController) UpdateIngressStatus(*extensions.Ingress) []apiv1.LoadB
 func (n *NGINXController) OnUpdate(ingressCfg ingress.Configuration) error {
 	cfg := ngx_template.ReadConfig(n.configmap.Data)
 	cfg.Resolver = n.resolver
+	//在这里将负载均衡的策略改为round-robin
+	cfg.SwitchLoadBalanceAlgorithmToRB()
 
 	servers := []*server{}
 	for _, pb := range ingressCfg.PassthroughBackends {
