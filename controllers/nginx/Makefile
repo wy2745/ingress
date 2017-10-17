@@ -108,10 +108,8 @@ endif
 clean:
       sudo $(DOCKER) rmi -f $(MULTI_ARCH_IMG):$(TAG) || true
 
-cleanTmp:
-      sudo rm -r /tmp/tmp*
 
-build: clean cleanTmp
+build: clean 
 	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -a -installsuffix cgo \
 		-ldflags "-s -w -X ${PKG}/pkg/version.RELEASE=${TAG} -X ${PKG}/pkg/version.COMMIT=${COMMIT} -X ${PKG}/pkg/version.REPO=${REPO_INFO}" \
 		-o ${TEMP_DIR}/rootfs/nginx-ingress-controller ${PKG}/pkg/cmd/controller
