@@ -55,6 +55,7 @@ import (
 	"github.com/wy2745/ingress/core/pkg/ingress/status"
 	"github.com/wy2745/ingress/core/pkg/k8s"
 	"github.com/wy2745/ingress/core/pkg/net/ssl"
+	heapsterManager "github.com/wy2745/ingress/core/pkg"
 	local_strings "github.com/wy2745/ingress/core/pkg/strings"
 	"github.com/wy2745/ingress/core/pkg/task"
 	"k8s.io/heapster/metrics/sources"
@@ -79,7 +80,7 @@ const (
 	kubernetesPodNamespaceLabel = "io.kubernetes.pod.namespace"
 	kubernetesPodUID            = "io.kubernetes.pod.uid"
 	kubernetesContainerLabel    = "io.kubernetes.container.name"
-
+	ResyncGap        = 10*time.Second
 
 )
 
@@ -150,9 +151,11 @@ type GenericController struct {
 	initialSyncDone int32
 
 	//为了方便获取负载加入的变量
-	sourceManager core.MetricsSource
+	heapsterManager heapsterManager.Manager
 
-	dataProcessors []core.DataProcessor
+	//sourceManager core.MetricsSource
+
+	//dataProcessors []core.DataProcessor
 }
 
 // Configuration contains all the settings required by an Ingress controller
@@ -489,9 +492,13 @@ func newIngressController(config *Configuration) *GenericController {
 		fmt.Println(err)
 	}
 	//需要在这里建立新的sourceManager和dataProcessors
-	ic.sourceManager, err = sources.NewSourceManager(kubeletProvider, sources.DefaultMetricsScrapeTimeout)
-	ic.dataProcessors = ic.createDataProcessorsOrDie(ic.listers.Pod)
-
+	sourceManager, err := sources.NewSourceManager(kubeletProvider, sources.DefaultMetricsScrapeTimeout)
+	dataProcessors := ic.createDataProcessorsOrDie(ic.listers.Pod)
+	ic.heapsterManager, err = heapsterManager.NewManager(sourceManager, dataProcessors,
+		ResyncGap, heapsterManager.DefaultScrapeOffset, heapsterManager.DefaultMaxParallelism)
+	if err != nil {
+		glog.Fatalf("Failed to create heapster manager: %v", err)
+	}
 
 
 	if err != nil {
@@ -1562,6 +1569,9 @@ func (ic *GenericController) readSecrets(ing *extensions.Ingress) {
 // Stop stops the loadbalancer controller.
 func (ic GenericController) Stop() error {
 	ic.stopLock.Lock()
+	//heapster manager的停止
+	ic.heapsterManager.Stop()
+
 	defer ic.stopLock.Unlock()
 
 	// Only try draining the workqueue if we haven't already.
@@ -1581,6 +1591,9 @@ func (ic GenericController) Stop() error {
 // Start starts the Ingress controller.
 func (ic *GenericController) Start() {
 	glog.Infof("starting Ingress controller")
+
+	//heapster manager的启动
+	ic.heapsterManager.Start()
 
 	go ic.ingController.Run(ic.stopCh)
 	go ic.endpController.Run(ic.stopCh)
