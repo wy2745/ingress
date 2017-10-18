@@ -21,6 +21,7 @@ rules:
       - endpoints
       - nodes
       - pods
+      - namespaces
       - secrets
     verbs:
       - list
@@ -54,6 +55,9 @@ rules:
     verbs:
         - create
         - patch
+        - get
+        - list
+        - watch
   - apiGroups:
       - "extensions"
     resources:
