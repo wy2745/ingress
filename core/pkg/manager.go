@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
+	"strconv"
 )
 
 const (
@@ -121,7 +122,23 @@ func (rm *realManager) housekeep(start, end time.Time) {
 		}
 
 		glog.Info("这里是数据------------------------------")
-		glog.Info(data)
+		i:= 0
+		for key,value := range data.MetricSets{
+			glog.Info("data"+strconv.Itoa(i)+": -----------")
+			i+=1
+			glog.Info("key: "+key)
+			glog.Info("createTime: ")
+			glog.Info(value.CreateTime)
+			glog.Info("metric value: ")
+			j:=0
+			for key2,value2 := range value.MetricValues{
+				glog.Info("subkey"+strconv.Itoa(j)+": "+key2+"-----------")
+				j+=1
+				glog.Info(value2.IntValue)
+			}
+		}
+		//glog.Info(data)
+		//glog.Info(data.MetricSets["sdf"].MetricValues["sdfsd"].IntValue)
 		// Export data to sinks
 		//rm.sink.ExportData(data)
 
