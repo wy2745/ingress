@@ -131,9 +131,11 @@ func (rm *realManager) consumeData(batch *core.DataBatch){
 		glog.Info("结果：")
 		glog.Info(ok)
 		if(!ok){
+			glog.Info("haha")
 			value = list.New()
 			rm.data.sum[metricSourceName] = copyMetricSet(metric)
 			value.PushBack(metric)
+			rm.data.historicalData[metricSourceName] = value
 		} else{
 			if(value.Len() <DataSumSize){
 				for i1,v1 := range metric.LabeledMetrics{
