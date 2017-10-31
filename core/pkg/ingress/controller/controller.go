@@ -364,6 +364,7 @@ func (this *kubeletMetricsSource) decodeMetrics(c *cadvisor.ContainerInfo) (stri
 	return metricSetKey, cMetrics
 }
 
+//在这里对这个函数进行改造，改造思路，对于每个container，保存一个队列，存在近30s中的六组以5s为间隔的负载数据，，以及这六组数据的负载总和，一旦有新的数据加入，从队列中剔除最旧的数据加入新数据，用总和减去旧数据，加上新数据
 func (this *kubeletMetricsSource) ScrapeMetrics(start, end time.Time) *core.DataBatch {
 	//这里是对container负载的获取
 	containers, err := this.scrapeKubelet(this.kubeletClient, this.host, start, end)
@@ -377,6 +378,8 @@ func (this *kubeletMetricsSource) ScrapeMetrics(start, end time.Time) *core.Data
 		MetricSets: map[string]*core.MetricSet{},
 	}
 	keys := make(map[string]bool)
+
+
 	for _, c := range containers {
 		name, metrics := this.decodeMetrics(&c)
 		if name == "" || metrics == nil {
