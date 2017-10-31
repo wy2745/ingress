@@ -65,7 +65,7 @@ type dataSum struct{
 func NewManager(source core.MetricsSource, processors []core.DataProcessor, resolution time.Duration,
 	scrapeOffset time.Duration, maxParallelism int) (Manager, error) {
 		datasum := dataSum{
-			historicalData:make(map[string]*list.List),sum:(map[string]*MetricSet2),
+			historicalData:make(map[string]*list.List),sum:make(map[string]*MetricSet2),
 		}
 	manager := realManager{
 		source:                 source,
