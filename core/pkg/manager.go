@@ -133,7 +133,7 @@ func copyMetricSet(set *core.MetricSet) *MetricSet2 {
 }
 func (rm *realManager) writeLoadFile() {
 	glog.Info("开始写数据-------------------")
-	file, err1 := os.OpenFile(LoadDataFilePath, os.O_APPEND, 0666)
+	file, err1 := os.OpenFile(LoadDataFilePath,os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err1 != nil {
 		glog.Info(err1)
 	}

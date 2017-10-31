@@ -44,4 +44,4 @@ spec:
       volumes:
         - name: loadpath
           hostPath:
-          path: /home/administrator/tsung-test
+            path: /home/administrator/tsung-test

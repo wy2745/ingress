@@ -24,3 +24,10 @@ spec:
         backend:
           serviceName: echoheaders-x
           servicePort: 80
+  - host: nginx.test.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: nginxsvc
+          servicePort: 80
