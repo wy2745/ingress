@@ -300,8 +300,9 @@ func (this *kubeletMetricsSource) decodeMetrics(c *cadvisor.ContainerInfo) (stri
 		//这里有个system container和kubernetes container的区别
 		//暂时考虑不加入系统的container
 		if cName == "" || ns == "" || podName == "" {
-			metricSetKey = this.handleSystemContainer(c, cMetrics)
+			//metricSetKey = this.handleSystemContainer(c, cMetrics)
 			//如果是系统的container，直接返回
+			return "",nil
 		} else {
 			metricSetKey = this.handleKubernetesContainer(cName, ns, podName, c, cMetrics)
 		}
