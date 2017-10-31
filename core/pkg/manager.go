@@ -143,7 +143,19 @@ func (rm *realManager) consumeData(batch *core.DataBatch){
 					}
 				}
 				glog.Info("-----------------1")
+				_,ok2 := rm.data.sum[metricSourceName]
+				if(ok2){
+					glog.Info("找到")
+				}else{
+					glog.Info("没找到"+metricSourceName)
+				}
 				for k1,v1 := range metric.MetricValues{
+					_,ok2 := rm.data.sum[metricSourceName].MetricValues[k1]
+					if(ok2){
+						glog.Info("找到")
+					}else{
+						glog.Info("没找到metric"+k1)
+					}
 					rm.data.sum[metricSourceName].MetricValues[k1].IntValue = (rm.data.sum[metricSourceName].MetricValues[k1].IntValue* int64(value.Len())+v1.IntValue)/int64(value.Len()+1)
 				}
 				glog.Info("-----------------2")
