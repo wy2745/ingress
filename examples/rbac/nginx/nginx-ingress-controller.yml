@@ -33,8 +33,15 @@ spec:
                valueFrom:
                  fieldRef:
                    fieldPath: metadata.namespace
+          volumeMounts:
+             - name: loadpath
+               mountPath: /home/load
           ports:
           - name: http
             containerPort: 80
           - name: https
             containerPort: 443
+      volumes:
+        - name: loadpath
+          hostPath:
+          path: /home/administrator/tsung-test

@@ -1,19 +1,24 @@
 package pkg
+
 import (
 	"time"
 
 	"k8s.io/heapster/metrics/core"
 
+	"container/list"
 	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
+	"os"
 	"strconv"
-	"container/list"
+	"io"
 )
 
 const (
 	DefaultScrapeOffset   = 5 * time.Second
 	DefaultMaxParallelism = 3
 	DataSumSize           = 6
+	LoadDataFilePath      = "/home/load/load.txt"
+	LoadDataFlushMax      = 6
 )
 
 var (
@@ -46,10 +51,11 @@ type realManager struct {
 	stopChan               chan struct{}
 	housekeepSemaphoreChan chan struct{}
 	housekeepTimeout       time.Duration
-	data					*dataSum
+	data                   *dataSum
+	loadResyncTime         int
 }
 
-type MetricSet2 struct{
+type MetricSet2 struct {
 	CreateTime     time.Time
 	ScrapeTime     time.Time
 	MetricValues   map[string]*core.MetricValue
@@ -57,16 +63,16 @@ type MetricSet2 struct{
 	LabeledMetrics map[string]*core.LabeledMetric
 }
 
-type dataSum struct{
+type dataSum struct {
 	historicalData map[string]*list.List
-	sum 		   map[string]*MetricSet2
+	sum            map[string]*MetricSet2
 }
 
 func NewManager(source core.MetricsSource, processors []core.DataProcessor, resolution time.Duration,
 	scrapeOffset time.Duration, maxParallelism int) (Manager, error) {
-		datasum := dataSum{
-			historicalData:make(map[string]*list.List),sum:make(map[string]*MetricSet2),
-		}
+	datasum := dataSum{
+		historicalData: make(map[string]*list.List), sum: make(map[string]*MetricSet2),
+	}
 	manager := realManager{
 		source:                 source,
 		processors:             processors,
@@ -75,7 +81,8 @@ func NewManager(source core.MetricsSource, processors []core.DataProcessor, reso
 		stopChan:               make(chan struct{}),
 		housekeepSemaphoreChan: make(chan struct{}, maxParallelism),
 		housekeepTimeout:       resolution / 2,
-		data:					&datasum,
+		data:                   &datasum,
+		loadResyncTime:         0,
 	}
 
 	for i := 0; i < maxParallelism; i++ {
@@ -109,73 +116,102 @@ func (rm *realManager) Housekeep() {
 		}
 	}
 }
-func copyMetricSet(set *core.MetricSet) *MetricSet2{
+func copyMetricSet(set *core.MetricSet) *MetricSet2 {
 	metricValue := make(map[string]*core.MetricValue)
-	label       := make(map[string]string)
-	labeledMetric :=make(map[string]*core.LabeledMetric)
-	for _,value:= range set.LabeledMetrics{
-		labeledMetric[value.Name] = &core.LabeledMetric{value.Name,value.Labels,value.MetricValue}
+	label := make(map[string]string)
+	labeledMetric := make(map[string]*core.LabeledMetric)
+	for _, value := range set.LabeledMetrics {
+		labeledMetric[value.Name] = &core.LabeledMetric{value.Name, value.Labels, value.MetricValue}
 	}
-	for key,value:= range set.Labels{
+	for key, value := range set.Labels {
 		label[key] = value
 	}
-	for key,value := range set.MetricValues{
-		metricValue[key] = &core.MetricValue{value.IntValue,value.FloatValue,value.MetricType,value.ValueType}
+	for key, value := range set.MetricValues {
+		metricValue[key] = &core.MetricValue{value.IntValue, value.FloatValue, value.MetricType, value.ValueType}
 	}
-	return &MetricSet2{CreateTime:set.CreateTime,ScrapeTime:set.ScrapeTime,Labels:label,MetricValues:metricValue,LabeledMetrics:labeledMetric}
+	return &MetricSet2{CreateTime: set.CreateTime, ScrapeTime: set.ScrapeTime, Labels: label, MetricValues: metricValue, LabeledMetrics: labeledMetric}
+}
+func (rm *realManager) writeLoadFile() {
+	glog.Info("开始写数据-------------------")
+	file, err1 := os.OpenFile(LoadDataFilePath, os.O_APPEND, 0666)
+	if err1 != nil {
+		glog.Info(err1)
+	}
+	defer file.Close()
+	_,err1 = io.WriteString(file,"数据"+strconv.Itoa(rm.loadResyncTime)+"----------------")
+	if err1 != nil {
+		glog.Info(err1)
+	}
+	for k1,_ :=range rm.data.historicalData {
+		for key, value := range rm.data.sum[k1].MetricValues {
+			_,err1 := io.WriteString(file,key + "  :" + strconv.FormatInt(value.IntValue, 10))
+			if err1 != nil {
+				glog.Info(err1)
+			}
+		}
+		for _, value := range rm.data.sum[k1].LabeledMetrics {
+			_,err1 := io.WriteString(file,value.Name + strconv.FormatInt(value.IntValue, 10))
+			if err1 != nil {
+				glog.Info(err1)
+			}
+		}
+	}
+
 }
 
-func (rm *realManager) consumeData(batch *core.DataBatch){
-	for metricSourceName, metric:= range batch.MetricSets{
-		value ,ok := rm.data.historicalData[metricSourceName]
-		if(!ok){
+func (rm *realManager) consumeData(batch *core.DataBatch) {
+	rm.loadResyncTime = (rm.loadResyncTime + 1) % 6
+
+	for metricSourceName, metric := range batch.MetricSets {
+		value, ok := rm.data.historicalData[metricSourceName]
+		if !ok {
 			value = list.New()
 			rm.data.sum[metricSourceName] = copyMetricSet(metric)
 			value.PushBack(metric)
 			rm.data.historicalData[metricSourceName] = value
-		} else{
-			if(value.Len() <DataSumSize){
-				for _,v1 := range metric.LabeledMetrics{
-					_,ok2 := rm.data.sum[metricSourceName].LabeledMetrics[v1.Name]
-					if(!ok2) {
-						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{v1.Name,v1.Labels,v1.MetricValue}
-					}else{
-						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue = ((rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue* int64(value.Len())+v1.IntValue)/int64(value.Len()+1))
+		} else {
+			if value.Len() < DataSumSize {
+				for _, v1 := range metric.LabeledMetrics {
+					_, ok2 := rm.data.sum[metricSourceName].LabeledMetrics[v1.Name]
+					if !ok2 {
+						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{v1.Name, v1.Labels, v1.MetricValue}
+					} else {
+						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue = ((rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue*int64(value.Len()) + v1.IntValue) / int64(value.Len()+1))
 					}
 
 				}
-				for k1,v1 := range metric.MetricValues{
-					_,ok2 := rm.data.sum[metricSourceName].MetricValues[k1]
-					if(!ok2){
-						rm.data.sum[metricSourceName].MetricValues[k1]=&core.MetricValue{v1.IntValue,v1.FloatValue,v1.MetricType,v1.ValueType}
-					}else {
+				for k1, v1 := range metric.MetricValues {
+					_, ok2 := rm.data.sum[metricSourceName].MetricValues[k1]
+					if !ok2 {
+						rm.data.sum[metricSourceName].MetricValues[k1] = &core.MetricValue{v1.IntValue, v1.FloatValue, v1.MetricType, v1.ValueType}
+					} else {
 						rm.data.sum[metricSourceName].MetricValues[k1].IntValue = (rm.data.sum[metricSourceName].MetricValues[k1].IntValue*int64(value.Len()) + v1.IntValue) / int64(value.Len()+1)
 					}
 				}
 				value.PushBack(metric)
-			}else{
+			} else {
 				s1 := value.Front()
 				value.Remove(s1)
 
-				for i1,v1 := range metric.LabeledMetrics{
-					_,ok2 := rm.data.sum[metricSourceName].LabeledMetrics[v1.Name]
-					if(!ok2) {
-						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{v1.Name,v1.Labels,v1.MetricValue}
-					}else {
-						if (i1<len(s1.Value.(*core.MetricSet).LabeledMetrics)) {
-							if(s1.Value.(*core.MetricSet).LabeledMetrics[i1].Name == v1.Name) {
+				for i1, v1 := range metric.LabeledMetrics {
+					_, ok2 := rm.data.sum[metricSourceName].LabeledMetrics[v1.Name]
+					if !ok2 {
+						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{v1.Name, v1.Labels, v1.MetricValue}
+					} else {
+						if i1 < len(s1.Value.(*core.MetricSet).LabeledMetrics) {
+							if s1.Value.(*core.MetricSet).LabeledMetrics[i1].Name == v1.Name {
 								rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue = ((rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue*int64(value.Len()) - s1.Value.(*core.MetricSet).LabeledMetrics[i1].IntValue + v1.IntValue) / int64(value.Len()))
 							}
 						}
 					}
 				}
-				for k1,v1 := range metric.MetricValues{
-					_,ok2 := rm.data.sum[metricSourceName].MetricValues[k1]
-					if(!ok2){
-						rm.data.sum[metricSourceName].MetricValues[k1]=&core.MetricValue{v1.IntValue,v1.FloatValue,v1.MetricType,v1.ValueType}
-					}else {
-						_,ok2 := s1.Value.(*core.MetricSet).MetricValues[k1]
-						if(ok2) {
+				for k1, v1 := range metric.MetricValues {
+					_, ok2 := rm.data.sum[metricSourceName].MetricValues[k1]
+					if !ok2 {
+						rm.data.sum[metricSourceName].MetricValues[k1] = &core.MetricValue{v1.IntValue, v1.FloatValue, v1.MetricType, v1.ValueType}
+					} else {
+						_, ok2 := s1.Value.(*core.MetricSet).MetricValues[k1]
+						if ok2 {
 							rm.data.sum[metricSourceName].MetricValues[k1].IntValue = (rm.data.sum[metricSourceName].MetricValues[k1].IntValue*int64(value.Len()) - s1.Value.(*core.MetricSet).MetricValues[k1].IntValue + v1.IntValue) / int64(value.Len())
 						}
 					}
@@ -183,6 +219,9 @@ func (rm *realManager) consumeData(batch *core.DataBatch){
 				value.PushBack(metric)
 			}
 		}
+	}
+	if rm.loadResyncTime == 0 {
+		rm.writeLoadFile()
 	}
 }
 
@@ -219,26 +258,24 @@ func (rm *realManager) housekeep(start, end time.Time) {
 		//处理数据，进行统计
 		rm.consumeData(data)
 
-		for k1,v1 :=range rm.data.historicalData{
-			glog.Info("pod--"+k1+"的历史数据")
-			for p1:= v1.Front();p1!=nil;p1=p1.Next(){
-				for key,value := range p1.Value.(*core.MetricSet).MetricValues{
-					glog.Info(key+"  :"+strconv.FormatInt(value.IntValue,10))
-				}
-				for _,value := range p1.Value.(*core.MetricSet).LabeledMetrics{
-					glog.Info(value.Name+strconv.FormatInt(value.IntValue,10))
-				}
-			}
-			glog.Info("-------统计数据")
-			for key,value := range rm.data.sum[k1].MetricValues{
-				glog.Info(key+"  :"+strconv.FormatInt(value.IntValue,10))
-			}
-			for _,value := range rm.data.sum[k1].LabeledMetrics{
-				glog.Info(value.Name+strconv.FormatInt(value.IntValue,10))
-			}
-		}
-
-
+		//for k1,v1 :=range rm.data.historicalData{
+		//	glog.Info("pod--"+k1+"的历史数据")
+		//	for p1:= v1.Front();p1!=nil;p1=p1.Next(){
+		//		for key,value := range p1.Value.(*core.MetricSet).MetricValues{
+		//			glog.Info(key+"  :"+strconv.FormatInt(value.IntValue,10))
+		//		}
+		//		for _,value := range p1.Value.(*core.MetricSet).LabeledMetrics{
+		//			glog.Info(value.Name+strconv.FormatInt(value.IntValue,10))
+		//		}
+		//	}
+		//	glog.Info("-------统计数据")
+		//	for key,value := range rm.data.sum[k1].MetricValues{
+		//		glog.Info(key+"  :"+strconv.FormatInt(value.IntValue,10))
+		//	}
+		//	for _,value := range rm.data.sum[k1].LabeledMetrics{
+		//		glog.Info(value.Name+strconv.FormatInt(value.IntValue,10))
+		//	}
+		//}
 
 		//glog.Info("这里是数据------------------------------")
 		//i:= 0
@@ -283,9 +320,8 @@ func (rm *realManager) housekeep(start, end time.Time) {
 func process(p core.DataProcessor, data *core.DataBatch) (*core.DataBatch, error) {
 	startTime := time.Now()
 	defer processorDuration.
-	WithLabelValues(p.Name()).
+		WithLabelValues(p.Name()).
 		Observe(float64(time.Since(startTime)) / float64(time.Microsecond))
 
 	return p.Process(data)
 }
-
