@@ -54,7 +54,7 @@ type MetricSet2 struct{
 	ScrapeTime     time.Time
 	MetricValues   map[string]*core.MetricValue
 	Labels         map[string]string
-	LabeledMetrics []core.LabeledMetric
+	LabeledMetrics map[string]*core.LabeledMetric
 }
 
 type dataSum struct{
@@ -112,9 +112,9 @@ func (rm *realManager) Housekeep() {
 func copyMetricSet(set *core.MetricSet) *MetricSet2{
 	metricValue := make(map[string]*core.MetricValue)
 	label       := make(map[string]string)
-	var labeledMetric []core.LabeledMetric
+	labeledMetric :=make(map[string]*core.LabeledMetric)
 	for _,value:= range set.LabeledMetrics{
-		labeledMetric = append(labeledMetric,value)
+		labeledMetric[value.Name] = &value
 	}
 	for key,value:= range set.Labels{
 		label[key] = value
@@ -135,12 +135,14 @@ func (rm *realManager) consumeData(batch *core.DataBatch){
 			rm.data.historicalData[metricSourceName] = value
 		} else{
 			if(value.Len() <DataSumSize){
-				for i1,v1 := range metric.LabeledMetrics{
-					if((rm.data.sum[metricSourceName].LabeledMetrics[i1].Name == v1.Name)){
-						rm.data.sum[metricSourceName].LabeledMetrics[i1].IntValue = ((rm.data.sum[metricSourceName].LabeledMetrics[i1].IntValue* int64(value.Len())+v1.IntValue)/int64(value.Len()+1))
+				for _,v1 := range metric.LabeledMetrics{
+					_,ok2 := rm.data.sum[metricSourceName].LabeledMetrics[v1.Name]
+					if(!ok2) {
+						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{v1.Name,v1.Labels,v1.MetricValue}
 					}else{
-						glog.Info("----------------------------------------Oh")
+						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue = ((rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue* int64(value.Len())+v1.IntValue)/int64(value.Len()+1))
 					}
+
 				}
 				for k1,v1 := range metric.MetricValues{
 					_,ok2 := rm.data.sum[metricSourceName].MetricValues[k1]
@@ -156,10 +158,11 @@ func (rm *realManager) consumeData(batch *core.DataBatch){
 				value.Remove(s1)
 
 				for i1,v1 := range metric.LabeledMetrics{
-					if((rm.data.sum[metricSourceName].LabeledMetrics[i1].Name == v1.Name)){
-						rm.data.sum[metricSourceName].LabeledMetrics[i1].IntValue = ((rm.data.sum[metricSourceName].LabeledMetrics[i1].IntValue* int64(value.Len())-s1.Value.(*core.MetricSet).LabeledMetrics[i1].IntValue+v1.IntValue)/int64(value.Len()))
-					}else{
-						glog.Info("----------------------------------------Oh")
+					_,ok2 := rm.data.sum[metricSourceName].LabeledMetrics[v1.Name]
+					if(!ok2) {
+						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{v1.Name,v1.Labels,v1.MetricValue}
+					}else {
+						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue = ((rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue*int64(value.Len()) - s1.Value.(*core.MetricSet).LabeledMetrics[i1].IntValue + v1.IntValue) / int64(value.Len()))
 					}
 				}
 				for k1,v1 := range metric.MetricValues{
