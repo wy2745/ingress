@@ -142,27 +142,16 @@ func (rm *realManager) consumeData(batch *core.DataBatch){
 						glog.Info("----------------------------------------Oh")
 					}
 				}
-				glog.Info("-----------------1")
-				_,ok2 := rm.data.sum[metricSourceName]
-				if(ok2){
-					glog.Info("找到")
-				}else{
-					glog.Info("没找到"+metricSourceName)
-				}
 				for k1,v1 := range metric.MetricValues{
 					_,ok2 := rm.data.sum[metricSourceName].MetricValues[k1]
-					if(ok2){
-						glog.Info("找到")
-					}else{
-						glog.Info("没找到metric"+k1)
+					if(!ok2){
+						rm.data.sum[metricSourceName].MetricValues[k1]=&core.MetricValue{v1.IntValue,v1.FloatValue,v1.MetricType,v1.ValueType}
+					}else {
+						rm.data.sum[metricSourceName].MetricValues[k1].IntValue = (rm.data.sum[metricSourceName].MetricValues[k1].IntValue*int64(value.Len()) + v1.IntValue) / int64(value.Len()+1)
 					}
-					rm.data.sum[metricSourceName].MetricValues[k1].IntValue = (rm.data.sum[metricSourceName].MetricValues[k1].IntValue* int64(value.Len())+v1.IntValue)/int64(value.Len()+1)
 				}
-				glog.Info("-----------------2")
 				value.PushBack(metric)
-				glog.Info("-----------------3")
 			}else{
-				glog.Info("-----------------4")
 				s1 := value.Front()
 				value.Remove(s1)
 
@@ -174,7 +163,12 @@ func (rm *realManager) consumeData(batch *core.DataBatch){
 					}
 				}
 				for k1,v1 := range metric.MetricValues{
-					rm.data.sum[metricSourceName].MetricValues[k1].IntValue = (rm.data.sum[metricSourceName].MetricValues[k1].IntValue* int64(value.Len())-s1.Value.(*core.MetricSet).MetricValues[k1].IntValue+v1.IntValue)/int64(value.Len())
+					_,ok2 := rm.data.sum[metricSourceName].MetricValues[k1]
+					if(!ok2){
+						rm.data.sum[metricSourceName].MetricValues[k1]=&core.MetricValue{v1.IntValue,v1.FloatValue,v1.MetricType,v1.ValueType}
+					}else {
+						rm.data.sum[metricSourceName].MetricValues[k1].IntValue = (rm.data.sum[metricSourceName].MetricValues[k1].IntValue*int64(value.Len()) - s1.Value.(*core.MetricSet).MetricValues[k1].IntValue + v1.IntValue) / int64(value.Len())
+					}
 				}
 				value.PushBack(metric)
 			}
