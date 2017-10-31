@@ -114,7 +114,7 @@ func copyMetricSet(set *core.MetricSet) *MetricSet2{
 	label       := make(map[string]string)
 	labeledMetric :=make(map[string]*core.LabeledMetric)
 	for _,value:= range set.LabeledMetrics{
-		labeledMetric[value.Name] = &value
+		labeledMetric[value.Name] = &core.LabeledMetric{value.Name,value.Labels,value.MetricValue}
 	}
 	for key,value:= range set.Labels{
 		label[key] = value
