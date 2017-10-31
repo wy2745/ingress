@@ -223,6 +223,7 @@ func (this *kubeletMetricsSource) handleSystemContainer(c *cadvisor.ContainerInf
 	return core.NodeContainerKey(this.nodename, cName)
 }
 
+//这个函数会提取pod或者container的数据-----需要考虑到的是，同一个pod里面的多个container之间资源的互相影响
 func (this *kubeletMetricsSource) handleKubernetesContainer(cName, ns, podName string, c *cadvisor.ContainerInfo, cMetrics *core.MetricSet) string {
 	var metricSetKey string
 	if cName == infraContainerName {
@@ -245,6 +246,9 @@ func isNode(c *cadvisor.ContainerInfo) bool {
 	return c.Name == "/"
 }
 
+
+//负责处理获得的负载数据的，筛选数据可以从这里着手
+//只要不是pod或者container就可以不返回数据
 func (this *kubeletMetricsSource) decodeMetrics(c *cadvisor.ContainerInfo) (string, *core.MetricSet) {
 	if len(c.Stats) == 0 {
 		return "", nil
@@ -293,19 +297,24 @@ func (this *kubeletMetricsSource) decodeMetrics(c *cadvisor.ContainerInfo) (stri
 		}
 
 		// No Kubernetes metadata so treat this as a system container.
+		//这里有个system container和kubernetes container的区别
+		//暂时考虑不加入系统的container
 		if cName == "" || ns == "" || podName == "" {
 			metricSetKey = this.handleSystemContainer(c, cMetrics)
+			//如果是系统的container，直接返回
 		} else {
 			metricSetKey = this.handleKubernetesContainer(cName, ns, podName, c, cMetrics)
 		}
 	}
 
+	//这里是能用到的基本的metric
 	for _, metric := range core.StandardMetrics {
 		if metric.HasValue != nil && metric.HasValue(&c.Spec) {
 			cMetrics.MetricValues[metric.Name] = metric.GetValue(&c.Spec, c.Stats[0])
 		}
 	}
 
+	//这是基本metric
 	for _, metric := range core.LabeledMetrics {
 		if metric.HasLabeledMetric != nil && metric.HasLabeledMetric(&c.Spec) {
 			labeledMetrics := metric.GetLabeledMetric(&c.Spec, c.Stats[0])
@@ -418,6 +427,7 @@ func getNodeHostnameAndIP(node *kube_api.Node) (string, string, error) {
 	}
 	return "", "", fmt.Errorf("Node %v has no valid hostname and/or IP address: %v %v", node.Name, hostname, ip)
 }
+//这个函数会对每一个node都生成一个KubeletMetricsSource
 func (this *kubeletProvider) GetMetricsSources() []core.MetricsSource {
 	sources := []core.MetricsSource{}
 	nodes, err := this.nodeLister.List(labels.Everything())

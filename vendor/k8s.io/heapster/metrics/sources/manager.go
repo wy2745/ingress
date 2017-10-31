@@ -77,6 +77,7 @@ func (this *sourceManager) Name() string {
 
 func (this *sourceManager) ScrapeMetrics(start, end time.Time) *DataBatch {
 	glog.V(1).Infof("Scraping metrics start: %s, end: %s", start, end)
+	//对于每个node都得到一个kubeleteMetricsSource
 	sources := this.metricsSourceProvider.GetMetricsSources()
 
 	responseChannel := make(chan *DataBatch)

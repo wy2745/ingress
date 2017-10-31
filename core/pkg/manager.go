@@ -136,6 +136,14 @@ func (rm *realManager) housekeep(start, end time.Time) {
 				j+=1
 				glog.Info(value2.IntValue)
 			}
+			j=0
+			for _,value2 := range value.LabeledMetrics{
+				glog.Info("subkey-l"+strconv.Itoa(j)+": -----------")
+				j+=1
+				glog.Info(value2.Name)
+				glog.Info(value2.IntValue)
+				glog.Info(value2.MetricType)
+			}
 		}
 		//glog.Info(data)
 		//glog.Info(data.MetricSets["sdf"].MetricValues["sdfsd"].IntValue)
