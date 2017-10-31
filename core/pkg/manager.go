@@ -128,7 +128,9 @@ func copyMetricSet(set *core.MetricSet) *MetricSet2{
 func (rm *realManager) consumeData(batch *core.DataBatch){
 	for metricSourceName, metric:= range batch.MetricSets{
 		value ,ok := rm.data.historicalData[metricSourceName]
-		if(ok == false){
+		glog.Info("结果：")
+		glog.Info(ok)
+		if(!ok){
 			value = list.New()
 			rm.data.sum[metricSourceName] = copyMetricSet(metric)
 			value.PushBack(metric)
