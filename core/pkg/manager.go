@@ -143,14 +143,18 @@ func (rm *realManager) writeLoadFile() {
 		glog.Info(err1)
 	}
 	for k1,_ :=range rm.data.historicalData {
+		_,err1 := io.WriteString(file,"负载源: "+k1 + "------------------\n")
+		if err1 != nil {
+			glog.Info(err1)
+		}
 		for key, value := range rm.data.sum[k1].MetricValues {
-			_,err1 := io.WriteString(file,key + "  :" + strconv.FormatInt(value.IntValue, 10))
+			_,err1 := io.WriteString(file,key + "  :" + strconv.FormatInt(value.IntValue, 10)+"\n")
 			if err1 != nil {
 				glog.Info(err1)
 			}
 		}
 		for _, value := range rm.data.sum[k1].LabeledMetrics {
-			_,err1 := io.WriteString(file,value.Name + strconv.FormatInt(value.IntValue, 10))
+			_,err1 := io.WriteString(file,value.Name + strconv.FormatInt(value.IntValue, 10)+"\n")
 			if err1 != nil {
 				glog.Info(err1)
 			}
