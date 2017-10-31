@@ -162,7 +162,11 @@ func (rm *realManager) consumeData(batch *core.DataBatch){
 					if(!ok2) {
 						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{v1.Name,v1.Labels,v1.MetricValue}
 					}else {
-						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue = ((rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue*int64(value.Len()) - s1.Value.(*core.MetricSet).LabeledMetrics[i1].IntValue + v1.IntValue) / int64(value.Len()))
+						if (i1<len(s1.Value.(*core.MetricSet).LabeledMetrics)) {
+							if(s1.Value.(*core.MetricSet).LabeledMetrics[i1].Name == v1.Name) {
+								rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue = ((rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue*int64(value.Len()) - s1.Value.(*core.MetricSet).LabeledMetrics[i1].IntValue + v1.IntValue) / int64(value.Len()))
+							}
+						}
 					}
 				}
 				for k1,v1 := range metric.MetricValues{
@@ -170,7 +174,10 @@ func (rm *realManager) consumeData(batch *core.DataBatch){
 					if(!ok2){
 						rm.data.sum[metricSourceName].MetricValues[k1]=&core.MetricValue{v1.IntValue,v1.FloatValue,v1.MetricType,v1.ValueType}
 					}else {
-						rm.data.sum[metricSourceName].MetricValues[k1].IntValue = (rm.data.sum[metricSourceName].MetricValues[k1].IntValue*int64(value.Len()) - s1.Value.(*core.MetricSet).MetricValues[k1].IntValue + v1.IntValue) / int64(value.Len())
+						_,ok2 := s1.Value.(*core.MetricSet).MetricValues[k1]
+						if(ok2) {
+							rm.data.sum[metricSourceName].MetricValues[k1].IntValue = (rm.data.sum[metricSourceName].MetricValues[k1].IntValue*int64(value.Len()) - s1.Value.(*core.MetricSet).MetricValues[k1].IntValue + v1.IntValue) / int64(value.Len())
+						}
 					}
 				}
 				value.PushBack(metric)
