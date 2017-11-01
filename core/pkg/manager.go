@@ -116,18 +116,19 @@ func (rm *realManager) Housekeep() {
 		}
 	}
 }
+//根据原本的core.metricSet类，返回自定义的方便统计数据的MetricSet类
 func copyMetricSet(set *core.MetricSet) *MetricSet2 {
 	metricValue := make(map[string]*core.MetricValue)
 	label := make(map[string]string)
 	labeledMetric := make(map[string]*core.LabeledMetric)
 	for _, value := range set.LabeledMetrics {
-		labeledMetric[value.Name] = &core.LabeledMetric{value.Name, value.Labels, value.MetricValue}
+		labeledMetric[value.Name] = &core.LabeledMetric{Name:value.Name, Labels:value.Labels, MetricValue:value.MetricValue}
 	}
 	for key, value := range set.Labels {
 		label[key] = value
 	}
 	for key, value := range set.MetricValues {
-		metricValue[key] = &core.MetricValue{value.IntValue, value.FloatValue, value.MetricType, value.ValueType}
+		metricValue[key] = &core.MetricValue{IntValue:value.IntValue, FloatValue:value.FloatValue, MetricType:value.MetricType, ValueType:value.ValueType}
 	}
 	return &MetricSet2{CreateTime: set.CreateTime, ScrapeTime: set.ScrapeTime, Labels: label, MetricValues: metricValue, LabeledMetrics: labeledMetric}
 }
@@ -163,6 +164,7 @@ func (rm *realManager) writeLoadFile() {
 
 }
 
+//将获得的新数据，采进统计数据和历史数据
 func (rm *realManager) consumeData(batch *core.DataBatch) {
 	rm.loadResyncTime = (rm.loadResyncTime + 1) % 6
 
@@ -178,7 +180,7 @@ func (rm *realManager) consumeData(batch *core.DataBatch) {
 				for _, v1 := range metric.LabeledMetrics {
 					_, ok2 := rm.data.sum[metricSourceName].LabeledMetrics[v1.Name]
 					if !ok2 {
-						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{v1.Name, v1.Labels, v1.MetricValue}
+						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{Name:v1.Name, Labels:v1.Labels, MetricValue:v1.MetricValue}
 					} else {
 						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue = ((rm.data.sum[metricSourceName].LabeledMetrics[v1.Name].IntValue*int64(value.Len()) + v1.IntValue) / int64(value.Len()+1))
 					}
@@ -187,7 +189,7 @@ func (rm *realManager) consumeData(batch *core.DataBatch) {
 				for k1, v1 := range metric.MetricValues {
 					_, ok2 := rm.data.sum[metricSourceName].MetricValues[k1]
 					if !ok2 {
-						rm.data.sum[metricSourceName].MetricValues[k1] = &core.MetricValue{v1.IntValue, v1.FloatValue, v1.MetricType, v1.ValueType}
+						rm.data.sum[metricSourceName].MetricValues[k1] = &core.MetricValue{IntValue:v1.IntValue, FloatValue:v1.FloatValue, MetricType:v1.MetricType, ValueType:v1.ValueType}
 					} else {
 						rm.data.sum[metricSourceName].MetricValues[k1].IntValue = (rm.data.sum[metricSourceName].MetricValues[k1].IntValue*int64(value.Len()) + v1.IntValue) / int64(value.Len()+1)
 					}
@@ -200,7 +202,7 @@ func (rm *realManager) consumeData(batch *core.DataBatch) {
 				for i1, v1 := range metric.LabeledMetrics {
 					_, ok2 := rm.data.sum[metricSourceName].LabeledMetrics[v1.Name]
 					if !ok2 {
-						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{v1.Name, v1.Labels, v1.MetricValue}
+						rm.data.sum[metricSourceName].LabeledMetrics[v1.Name] = &core.LabeledMetric{Name:v1.Name, Labels:v1.Labels, MetricValue:v1.MetricValue}
 					} else {
 						if i1 < len(s1.Value.(*core.MetricSet).LabeledMetrics) {
 							if s1.Value.(*core.MetricSet).LabeledMetrics[i1].Name == v1.Name {
@@ -212,7 +214,7 @@ func (rm *realManager) consumeData(batch *core.DataBatch) {
 				for k1, v1 := range metric.MetricValues {
 					_, ok2 := rm.data.sum[metricSourceName].MetricValues[k1]
 					if !ok2 {
-						rm.data.sum[metricSourceName].MetricValues[k1] = &core.MetricValue{v1.IntValue, v1.FloatValue, v1.MetricType, v1.ValueType}
+						rm.data.sum[metricSourceName].MetricValues[k1] = &core.MetricValue{IntValue:v1.IntValue, FloatValue:v1.FloatValue, MetricType:v1.MetricType, ValueType:v1.ValueType}
 					} else {
 						_, ok2 := s1.Value.(*core.MetricSet).MetricValues[k1]
 						if ok2 {
@@ -224,6 +226,7 @@ func (rm *realManager) consumeData(batch *core.DataBatch) {
 			}
 		}
 	}
+	//每30s统计一次
 	if rm.loadResyncTime == 0 {
 		rm.writeLoadFile()
 	}
