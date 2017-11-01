@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+    name: tsung
+    namespace: default
+spec:
+    nodeName: ist-master
+    containers:
+    - image: wy2745/tsung-test:1.0
+      imagePullPolicy: IfNotPresent
+      name: tsung
+      command:
+      - sleep
+      args:
+      - "1000"
+      volumeMounts:
+      - name: tsungpath
+        mountPath: /root/.tsung
+    volumes:
+    - name: tsungpath
+      hostPath:
+        path: /home/administrator/tsung-test

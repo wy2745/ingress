@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: apptest-svc
+  labels:
+    app: apptest
+spec:
+  type: NodePort
+  ports:
+  - port: 9090
+    protocol: TCP
+    name: http
+  selector:
+    app: apptest
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-test
+  labels:
+    app: apptest
+spec:
+  nodeName: ist-master
+  containers:
+  - image: wy2745/java-app-test:1.0
+    command: ["java","-jar","/home/test_app-1.0-SNAPSHOT.jar"]
+    name: app-test
+    ports:
+    - containerPort: 9090

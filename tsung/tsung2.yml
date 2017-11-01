@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tsung-svc
+  labels:
+    app: tsung
+spec:
+  type: NodePort
+  ports:
+  - port: 8091
+    protocol: TCP
+    name: http
+  selector:
+    app: tsung
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tsung-test
+  labells:
+    app: tsung
+spec:
+  containers:
+  - image: prima/tsung:1.6
+    name: tsung-test
+    volumeMounts:
+    - mountPath: /root/.tsung/tsung.xml
+      name: xml-path
+    - mountPath: /root/.tsung/log
+      name: log-path
+    ports:
+    - containerPort: 8091
+  volumes:
+  - name: xml-path
+    hostPath:
+      path: /path/to/tsung.xml
+  - name: log-path
+    hostPath:
+      path: /path/to/logs

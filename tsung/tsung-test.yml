@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+    name: tsung
+    namespace: default
+spec:
+    nodeName: ist-master
+    containers:
+    - image: wy2745/tsung-test:1.0
+      imagePullPolicy: IfNotPresent
+      name: tsung
+      volumeMounts:
+      - name: tsungpath
+        mountPath: /root/.tsung
+    volumes:
+    - name: tsungpath
+      hostPath:
+        path: /home/administrator/go/src/github.com/wy2745/ingress/tsung

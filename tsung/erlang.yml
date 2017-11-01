@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+    name: erlang
+    namespace: default
+spec:
+    nodeName: ist-master
+    containers:
+    - image: erlang:20
+      imagePullPolicy: IfNotPresent
+      name: erlang
+      command:
+      - sleep
+      args:
+      - "100000"
