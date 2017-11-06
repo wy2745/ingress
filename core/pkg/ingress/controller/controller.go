@@ -81,6 +81,7 @@ const (
 	kubernetesPodUID            = "io.kubernetes.pod.uid"
 	kubernetesContainerLabel    = "io.kubernetes.container.name"
 	ResyncGap        = 10*time.Second
+	testapp          = "app-test"
 
 )
 
@@ -224,23 +225,32 @@ func (this *kubeletMetricsSource) handleSystemContainer(c *cadvisor.ContainerInf
 }
 
 //这个函数会提取pod或者container的数据-----需要考虑到的是，同一个pod里面的多个container之间资源的互相影响
-func (this *kubeletMetricsSource) handleKubernetesContainer(cName, ns, podName string, c *cadvisor.ContainerInfo, cMetrics *core.MetricSet) string {
+func (this *kubeletMetricsSource) handleKubernetesContainer(cName, ns, podName string, c *cadvisor.ContainerInfo, cMetrics *core.MetricSet) (string,bool) {
 	var metricSetKey string
 	if cName == infraContainerName {
-		metricSetKey = core.PodKey(ns, podName)
-		cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePod
+		if(strings.Contains(podName,testapp)){
+			metricSetKey = core.PodKey(ns, podName)
+			cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePod
+		}else{
+			return "",false
+		}
+
 	} else {
-		metricSetKey = core.PodContainerKey(ns, podName, cName)
-		cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePodContainer
-		cMetrics.Labels[core.LabelContainerName.Key] = cName
-		cMetrics.Labels[core.LabelContainerBaseImage.Key] = c.Spec.Image
+		if(strings.Contains(podName,testapp)){
+			metricSetKey = core.PodContainerKey(ns, podName, cName)
+			cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePodContainer
+			cMetrics.Labels[core.LabelContainerName.Key] = cName
+			cMetrics.Labels[core.LabelContainerBaseImage.Key] = c.Spec.Image
+		}else{
+			return "",false
+		}
 	}
 	cMetrics.Labels[core.LabelPodId.Key] = c.Spec.Labels[kubernetesPodUID]
 	cMetrics.Labels[core.LabelPodName.Key] = podName
 	cMetrics.Labels[core.LabelNamespaceName.Key] = ns
 	// Needed for backward compatibility
 	cMetrics.Labels[core.LabelPodNamespace.Key] = ns
-	return metricSetKey
+	return metricSetKey,true
 }
 func isNode(c *cadvisor.ContainerInfo) bool {
 	return c.Name == "/"
@@ -304,7 +314,11 @@ func (this *kubeletMetricsSource) decodeMetrics(c *cadvisor.ContainerInfo) (stri
 			//如果是系统的container，直接返回
 			return "",nil
 		} else {
-			metricSetKey = this.handleKubernetesContainer(cName, ns, podName, c, cMetrics)
+			var ok bool
+			metricSetKey,ok = this.handleKubernetesContainer(cName, ns, podName, c, cMetrics)
+			if(ok == false){
+				return "",nil
+			}
 		}
 	}
 
