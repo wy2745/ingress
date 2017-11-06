@@ -14,12 +14,12 @@ spec:
       labels:
         k8s-app: nginx-ingress-lb
     spec:
-      nodeName: ist-master
+      nodeName: ist-slave2
       serviceAccountName: nginx-ingress-serviceaccount
       #serviceAccountName: heapster
       containers:
         - name: nginx-ingress-controller
-          image: gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.13
+          image: wy2745/nginx-ingress-controller:1.0
           args:
              - /nginx-ingress-controller
              - --default-backend-service=default/default-http-backend
@@ -44,4 +44,4 @@ spec:
       volumes:
         - name: loadpath
           hostPath:
-            path: /home/administrator/tsung-test
+            path: /home/administrator/go/src/github.com/wy2745/ingress/tsung
