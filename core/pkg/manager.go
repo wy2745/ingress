@@ -133,13 +133,14 @@ func copyMetricSet(set *core.MetricSet) *MetricSet2 {
 	return &MetricSet2{CreateTime: set.CreateTime, ScrapeTime: set.ScrapeTime, Labels: label, MetricValues: metricValue, LabeledMetrics: labeledMetric}
 }
 func (rm *realManager) writeLoadFile() {
-	glog.Info("开始写数据-------------------")
+	//glog.Info("开始写数据-------------------")
 	file, err1 := os.OpenFile(LoadDataFilePath,os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 	if err1 != nil {
 		glog.Info(err1)
 	}
 	defer file.Close()
-	_,err1 = io.WriteString(file,"数据"+strconv.Itoa(rm.loadResyncTime)+"----------------")
+
+	_,err1 = io.WriteString(file,"数据时间"+time.Now().String()+"----------------")
 	if err1 != nil {
 		glog.Info(err1)
 	}
@@ -160,6 +161,10 @@ func (rm *realManager) writeLoadFile() {
 				glog.Info(err1)
 			}
 		}
+	}
+	_,err1 = io.WriteString(file,"-------------------------------------")
+	if err1 != nil {
+		glog.Info(err1)
 	}
 
 }
