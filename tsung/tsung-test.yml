@@ -6,7 +6,7 @@ metadata:
 spec:
     nodeName: ist-slave1
     containers:
-    - image: wy2745/tsung-test:1.01
+    - image: docker.io/wy2745/tsung-test:1.01
       imagePullPolicy: IfNotPresent
       name: tsung
       volumeMounts:
