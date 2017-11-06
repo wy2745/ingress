@@ -19,7 +19,7 @@ spec:
       #serviceAccountName: heapster
       containers:
         - name: nginx-ingress-controller
-          image: docker.io/wy2745/nginx-ingress-controller:1.0
+          image: docker.io/wy2745/nginx-ingress-controller:1.01
           args:
              - /nginx-ingress-controller
              - --default-backend-service=default/default-http-backend
