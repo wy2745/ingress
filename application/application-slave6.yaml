@@ -1,11 +1,17 @@
-apiVersion: v1
-kind: Pod
+kind: Deployment
+apiVersion: extensions/v1beta1
 metadata:
   name: app-test-s6
   labels:
     app: apptest
 spec:
-  nodeName: ist-slave6
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: apptest
+    spec:
+      nodeName: ist-slave6
   containers:
   - image: docker.io/wy2745/java-app-test:1.0
     command: ["java","-jar","/home/test_app-1.0-SNAPSHOT.jar"]

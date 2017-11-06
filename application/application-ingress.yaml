@@ -7,7 +7,7 @@ spec:
   - host: test.java.com
     http:
       paths:
-      - path: /foo
+      - path: /
         backend:
           serviceName: apptest-svc
           servicePort: 80
