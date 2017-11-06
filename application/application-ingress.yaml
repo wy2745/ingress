@@ -1,0 +1,13 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: javamap
+spec:
+  rules:
+  - host: test.java.com
+    http:
+      paths:
+      - path: /foo
+        backend:
+          serviceName: apptest-svc
+          servicePort: 80

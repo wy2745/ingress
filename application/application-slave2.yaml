@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-test-s2
+  labels:
+    app: apptest
+spec:
+  nodeName: ist-slave2
+  containers:
+  - image: wy2745/applicationtest:1.0
+    command: ["/home/ApplicationForTest/ApplicationForTest"]
+    name: app-test-s2
+    ports:
+    - containerPort: 9090

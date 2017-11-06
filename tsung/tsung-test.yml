@@ -4,7 +4,7 @@ metadata:
     name: tsung
     namespace: default
 spec:
-    nodeName: ist-master
+    nodeName: ist-slave1
     containers:
     - image: wy2745/tsung-test:1.01
       imagePullPolicy: IfNotPresent

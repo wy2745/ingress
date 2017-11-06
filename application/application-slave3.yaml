@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-test-s3
+  labels:
+    app: apptest
+spec:
+  nodeName: ist-slave3
+  containers:
+  - image: wy2745/applicationtest:1.0
+    command: ["/home/ApplicationForTest/ApplicationForTest"]
+    name: app-test-s3
+    ports:
+    - containerPort: 9090
