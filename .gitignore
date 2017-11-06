@@ -28,4 +28,3 @@ Session.vim
 # coverage artifacts
 .coverprofile
 /gover.coverprofile
-tsung/log
