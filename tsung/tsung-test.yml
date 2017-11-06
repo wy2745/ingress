@@ -6,7 +6,7 @@ metadata:
 spec:
     nodeName: ist-master
     containers:
-    - image: wy2745/tsung-test:1.0
+    - image: wy2745/tsung-test:1.01
       imagePullPolicy: IfNotPresent
       name: tsung
       volumeMounts:
