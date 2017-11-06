@@ -12,9 +12,9 @@ spec:
         app: apptest
     spec:
       nodeName: ist-slave4
-  containers:
-  - image: docker.io/wy2745/java-app-test:1.0
-    command: ["java","-jar","/home/test_app-1.0-SNAPSHOT.jar"]
-    name: app-test-s4
-    ports:
-    - containerPort: 9090
+      containers:
+      - image: docker.io/wy2745/java-app-test:1.0
+        command: ["java","-jar","/home/test_app-1.0-SNAPSHOT.jar"]
+        name: app-test-s4
+        ports:
+        - containerPort: 9090
