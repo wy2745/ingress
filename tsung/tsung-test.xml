@@ -9,7 +9,7 @@
   
   <!-- Server side setup -->
 <servers>
-  <server host="myserver" port="80" type="tcp"></server>
+  <server host="test.java.com" port="80" type="tcp"></server>
 </servers>
 
   <!-- to start os monitoring (cpu, network, memory). Use an erlang
@@ -22,8 +22,8 @@
   <!-- several arrival phases can be set: for each phase, you can set
   the mean inter-arrival time between new clients and the phase
   duration -->
-   <arrivalphase phase="1" duration="1" unit="minute">
-     <users interarrival="2" unit="second"></users>
+   <arrivalphase phase="1" duration="5" unit="minute">
+     <users arrivalrate="50" unit="second"></users>
    </arrivalphase>
   </load>
 
@@ -43,8 +43,12 @@
 
     <!-- full url with server name, this overrides the "server" config value -->
 
-    <request> <http url="nginx.test.com/index.html" method="GET" version="1.1"></http> </request>
-
+    <request> <http url="/image5M.html" method="GET" version="1.1"></http> </request>
+    <!-- <request> <http url="test.java.com/image50M.html" method="GET" version="1.1"></http> </request> -->
+    <!-- <request> <http url="test.java.com/image750k.html" method="GET" version="1.1"></http> </request> -->
+    <!-- <request> <http url="test.java.com/memMWork?size=10" method="GET" version="1.1"></http> </request> -->
+    <!-- <request> <http url="test.java.com/cpuWork?size=10" method="GET" version="1.1"></http> </request> -->
+    
   </session>
  </sessions>
 </tsung>

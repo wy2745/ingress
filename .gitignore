@@ -24,6 +24,7 @@
 *.un~
 Session.vim
 .netrwhist
+tsung/log
 
 # coverage artifacts
 .coverprofile
