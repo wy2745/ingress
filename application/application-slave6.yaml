@@ -16,5 +16,8 @@ spec:
       - image: docker.io/wy2745/java-app-test:1.0
         command: ["java","-jar","/home/test_app-1.0-SNAPSHOT.jar"]
         name: app-test-s6
+        resources:
+          limits:
+            memory: "1Gi"
         ports:
         - containerPort: 9090

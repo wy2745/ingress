@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tsung-job
+spec:
+  template:
+    metadata:
+      name: tsung
+      namespace: default
+    spec:
+      nodeName: ist-slave1
+      containers:
+      - name: tsung
+        image: docker.io/wy2745/tsung-test:1.01
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: tsungpath
+          mountPath: /root/.tsung
+      restartPolicy: Never
+      volumes:
+      - name: tsungpath
+        hostPath:
+          path: /home/administrator/go/src/github.com/wy2745/ingress/tsung

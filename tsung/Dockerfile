@@ -6,7 +6,9 @@ COPY ./tsung-1.7.0.tar.gz /tmp/tsung-1.7.0.tar.gz
 #COPY ./pre-work.sh /home/pre-work.sh
 
 RUN apt-get update  \
+    && apt-get install -y vim \
     && apt-get install -y gnuplot \
+    && cpan Template \
     && cd /tmp/ \
     && tar xzf ./tsung-1.7.0.tar.gz \
     && cd tsung-1.7.0 \
