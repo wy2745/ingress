@@ -30,21 +30,24 @@ import (
 
 	"github.com/golang/glog"
 
-	"k8s.io/client-go/listers/core/v1"
-	kube_api "k8s.io/api/core/v1"
 	cadvisor "github.com/google/cadvisor/info/v1"
+	kube_api "k8s.io/api/core/v1"
 	extensions "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/conversion"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	v1core "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/flowcontrol"
 
+	heapsterManager "github.com/wy2745/ingress/core/pkg"
 	"github.com/wy2745/ingress/core/pkg/ingress"
 	"github.com/wy2745/ingress/core/pkg/ingress/annotations/class"
 	"github.com/wy2745/ingress/core/pkg/ingress/annotations/healthcheck"
@@ -53,17 +56,15 @@ import (
 	"github.com/wy2745/ingress/core/pkg/ingress/defaults"
 	"github.com/wy2745/ingress/core/pkg/ingress/resolver"
 	"github.com/wy2745/ingress/core/pkg/ingress/status"
+	"github.com/wy2745/ingress/core/pkg/ingress/store"
 	"github.com/wy2745/ingress/core/pkg/k8s"
 	"github.com/wy2745/ingress/core/pkg/net/ssl"
-	heapsterManager "github.com/wy2745/ingress/core/pkg"
 	local_strings "github.com/wy2745/ingress/core/pkg/strings"
 	"github.com/wy2745/ingress/core/pkg/task"
-	"k8s.io/heapster/metrics/sources"
 	"k8s.io/heapster/metrics/core"
+	"k8s.io/heapster/metrics/sources"
 	"k8s.io/heapster/metrics/sources/kubelet"
-	"github.com/wy2745/ingress/core/pkg/ingress/store"
 	//kube_api "k8s.io/client-go/pkg/api/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/heapster/metrics/processors"
 )
@@ -73,18 +74,16 @@ const (
 	defServerName   = "_"
 	rootLocation    = "/"
 
-	fakeCertificate = "default-fake-certificate"
+	fakeCertificate    = "default-fake-certificate"
 	infraContainerName = "POD"
 	// TODO: following constants are copied from k8s, change to use them directly
 	kubernetesPodNameLabel      = "io.kubernetes.pod.name"
 	kubernetesPodNamespaceLabel = "io.kubernetes.pod.namespace"
 	kubernetesPodUID            = "io.kubernetes.pod.uid"
 	kubernetesContainerLabel    = "io.kubernetes.container.name"
-	ResyncGap        = 10*time.Second
-	testapp          = "app-test"
-
+	ResyncGap                   = 10 * time.Second
+	testapp                     = "app-test"
 )
-
 
 var (
 	// list of ports that cannot be used by TCP or UDP services
@@ -106,8 +105,6 @@ var (
 	)
 )
 
-
-
 // GenericController holds the boilerplate code required to build an Ingress controlller.
 type GenericController struct {
 	cfg *Configuration
@@ -118,8 +115,6 @@ type GenericController struct {
 	nodeController cache.Controller
 	secrController cache.Controller
 	mapController  cache.Controller
-
-
 
 	listers *ingress.StoreLister
 
@@ -161,7 +156,7 @@ type GenericController struct {
 
 // Configuration contains all the settings required by an Ingress controller
 type Configuration struct {
-	Client clientset.Interface
+	Client        clientset.Interface
 	KubeletClient *kubelet.KubeletClient
 
 	ResyncPeriod   time.Duration
@@ -197,6 +192,7 @@ type kubeletProvider struct {
 	reflector     *cache.Reflector
 	kubeletClient *kubelet.KubeletClient
 }
+
 // Kubelet-provided metrics for pod and system container.
 type kubeletMetricsSource struct {
 	host          kubelet.Host
@@ -205,6 +201,7 @@ type kubeletMetricsSource struct {
 	hostname      string
 	hostId        string
 }
+
 func (this *kubeletMetricsSource) Name() string {
 	return this.String()
 }
@@ -225,24 +222,24 @@ func (this *kubeletMetricsSource) handleSystemContainer(c *cadvisor.ContainerInf
 }
 
 //这个函数会提取pod或者container的数据-----需要考虑到的是，同一个pod里面的多个container之间资源的互相影响
-func (this *kubeletMetricsSource) handleKubernetesContainer(cName, ns, podName string, c *cadvisor.ContainerInfo, cMetrics *core.MetricSet) (string,bool) {
+func (this *kubeletMetricsSource) handleKubernetesContainer(cName, ns, podName string, c *cadvisor.ContainerInfo, cMetrics *core.MetricSet) (string, bool) {
 	var metricSetKey string
 	if cName == infraContainerName {
-		if(strings.Contains(podName,testapp)){
+		if strings.Contains(podName, testapp) {
 			metricSetKey = core.PodKey(ns, podName)
 			cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePod
-		}else{
-			return "",false
+		} else {
+			return "", false
 		}
 
 	} else {
-		if(strings.Contains(podName,testapp)){
+		if strings.Contains(podName, testapp) {
 			metricSetKey = core.PodContainerKey(ns, podName, cName)
 			cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePodContainer
 			cMetrics.Labels[core.LabelContainerName.Key] = cName
 			cMetrics.Labels[core.LabelContainerBaseImage.Key] = c.Spec.Image
-		}else{
-			return "",false
+		} else {
+			return "", false
 		}
 	}
 	cMetrics.Labels[core.LabelPodId.Key] = c.Spec.Labels[kubernetesPodUID]
@@ -250,12 +247,11 @@ func (this *kubeletMetricsSource) handleKubernetesContainer(cName, ns, podName s
 	cMetrics.Labels[core.LabelNamespaceName.Key] = ns
 	// Needed for backward compatibility
 	cMetrics.Labels[core.LabelPodNamespace.Key] = ns
-	return metricSetKey,true
+	return metricSetKey, true
 }
 func isNode(c *cadvisor.ContainerInfo) bool {
 	return c.Name == "/"
 }
-
 
 //负责处理获得的负载数据的，筛选数据可以从这里着手
 //只要不是pod或者container就可以不返回数据
@@ -278,7 +274,7 @@ func (this *kubeletMetricsSource) decodeMetrics(c *cadvisor.ContainerInfo) (stri
 	}
 
 	if isNode(c) {
-		metricSetKey =core.NodeKey(this.nodename)
+		metricSetKey = core.NodeKey(this.nodename)
 		cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypeNode
 	} else {
 		cName := c.Spec.Labels[kubernetesContainerLabel]
@@ -312,12 +308,12 @@ func (this *kubeletMetricsSource) decodeMetrics(c *cadvisor.ContainerInfo) (stri
 		if cName == "" || ns == "" || podName == "" {
 			//metricSetKey = this.handleSystemContainer(c, cMetrics)
 			//如果是系统的container，直接返回
-			return "",nil
+			return "", nil
 		} else {
 			var ok bool
-			metricSetKey,ok = this.handleKubernetesContainer(cName, ns, podName, c, cMetrics)
-			if(ok == false){
-				return "",nil
+			metricSetKey, ok = this.handleKubernetesContainer(cName, ns, podName, c, cMetrics)
+			if ok == false {
+				return "", nil
 			}
 		}
 	}
@@ -393,7 +389,6 @@ func (this *kubeletMetricsSource) ScrapeMetrics(start, end time.Time) *core.Data
 	}
 	keys := make(map[string]bool)
 
-
 	for _, c := range containers {
 		name, metrics := this.decodeMetrics(&c)
 		if name == "" || metrics == nil {
@@ -445,6 +440,7 @@ func getNodeHostnameAndIP(node *kube_api.Node) (string, string, error) {
 	}
 	return "", "", fmt.Errorf("Node %v has no valid hostname and/or IP address: %v %v", node.Name, hostname, ip)
 }
+
 //这个函数会对每一个node都生成一个KubeletMetricsSource
 func (this *kubeletProvider) GetMetricsSources() []core.MetricsSource {
 	sources := []core.MetricsSource{}
@@ -477,8 +473,7 @@ func (this *kubeletProvider) GetMetricsSources() []core.MetricsSource {
 	return sources
 }
 
-func (ic *GenericController)NewKubeletProvider() (core.MetricsSourceProvider, error) {
-
+func (ic *GenericController) NewKubeletProvider() (core.MetricsSourceProvider, error) {
 
 	return &kubeletProvider{
 		nodeLister:    ic.listers.Node,
@@ -495,8 +490,6 @@ func newIngressController(config *Configuration) *GenericController {
 	eventBroadcaster.StartRecordingToSink(&v1core.EventSinkImpl{
 		Interface: config.Client.CoreV1().Events(config.Namespace),
 	})
-
-
 
 	ic := GenericController{
 		cfg:             config,
@@ -515,7 +508,7 @@ func newIngressController(config *Configuration) *GenericController {
 	//对event，ingress等建立了lister
 	ic.createListers(config.DisableNodeList)
 	//在这里需要设定一个KubeletProvider以供负载的采集
-	kubeletProvider,err := ic.NewKubeletProvider()
+	kubeletProvider, err := ic.NewKubeletProvider()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -528,12 +521,9 @@ func newIngressController(config *Configuration) *GenericController {
 		glog.Fatalf("Failed to create heapster manager: %v", err)
 	}
 
-
 	if err != nil {
 		fmt.Println(err)
 	}
-
-
 
 	if config.UpdateStatus {
 		ic.syncStatus = status.NewStatusSyncer(status.Config{
@@ -558,7 +548,7 @@ func newIngressController(config *Configuration) *GenericController {
 	return &ic
 }
 
-func (ic *GenericController)createDataProcessorsOrDie(podLister v1.PodLister) []core.DataProcessor {
+func (ic *GenericController) createDataProcessorsOrDie(podLister v1.PodLister) []core.DataProcessor {
 	dataProcessors := []core.DataProcessor{
 		// Convert cumulative to rate
 		processors.NewRateCalculator(core.RateMetricsMapping),
@@ -605,7 +595,7 @@ func (ic *GenericController)createDataProcessorsOrDie(podLister v1.PodLister) []
 			MetricsToAggregate: metricsToAggregate,
 		})
 
-	nodeAutoscalingEnricher, err := processors.NewNodeAutoscalingEnricher(ic.listers.Node,ic.listers.NodeReflector)
+	nodeAutoscalingEnricher, err := processors.NewNodeAutoscalingEnricher(ic.listers.Node, ic.listers.NodeReflector)
 	if err != nil {
 		glog.Fatalf("Failed to create NodeAutoscalingEnricher: %v", err)
 	}
@@ -617,7 +607,6 @@ func (ic *GenericController)createDataProcessorsOrDie(podLister v1.PodLister) []
 func (ic GenericController) Info() *ingress.BackendInfo {
 	return ic.cfg.Backend.Info()
 }
-
 
 // IngressClass returns information about the backend
 func (ic GenericController) IngressClass() string {
@@ -715,8 +704,8 @@ func (ic *GenericController) syncIngress(key interface{}) error {
 	}
 
 	pcfg := ingress.Configuration{
-		Backends:            upstreams,
-		Servers:             servers,
+		Backends: upstreams,
+		Servers:  servers,
 		//这里会获取service相应的endpoint更新到配置文件里面去
 		TCPEndpoints:        ic.getStreamServices(ic.cfg.TCPConfigMapName, kube_api.ProtocolTCP),
 		UDPEndpoints:        ic.getStreamServices(ic.cfg.UDPConfigMapName, kube_api.ProtocolUDP),
@@ -729,7 +718,7 @@ func (ic *GenericController) syncIngress(key interface{}) error {
 	}
 
 	glog.Infof("backend reload required")
-
+	//这个OnUpdate函数用于将更新的配置文件更新应用到实际上去
 	err := ic.cfg.Backend.OnUpdate(pcfg)
 	if err != nil {
 		incReloadErrorCount()
@@ -1487,7 +1476,15 @@ func (ic *GenericController) getEndpoints(
 	hz *healthcheck.Upstream) []ingress.Endpoint {
 
 	upsServers := []ingress.Endpoint{}
-
+	fmt.Println("-------------test")
+	requirement, err := labels.NewRequirement("app", selection.Equals, []string{"apptest"})
+	fmt.Println(err)
+	pods, err := ic.listers.Pod.Pods("default").List(labels.NewSelector().Add(*requirement))
+	for i, _ := range pods {
+		fmt.Println(pods[i].GetName())
+		fmt.Println(pods[i].Status.PodIP)
+	}
+	fmt.Println("--------------test-ok")
 	// avoid duplicated upstream servers when the service
 	// contains multiple port definitions sharing the same
 	// targetport.
@@ -1518,7 +1515,7 @@ func (ic *GenericController) getEndpoints(
 			MaxFails:    hz.MaxFails,
 			FailTimeout: hz.FailTimeout,
 			//在这里加入权重
-			Weight:		 weight,
+			Weight: weight,
 		})
 	}
 
@@ -1528,8 +1525,6 @@ func (ic *GenericController) getEndpoints(
 		glog.Warningf("unexpected error obtaining service endpoints: %v", err)
 		return upsServers
 	}
-
-
 
 	for _, ss := range ep.Subsets {
 		for _, epPort := range ss.Ports {
@@ -1563,8 +1558,8 @@ func (ic *GenericController) getEndpoints(
 					MaxFails:    hz.MaxFails,
 					FailTimeout: hz.FailTimeout,
 					//在这里加入权重
-					Weight:		 weight,
-					Target:      epAddress.TargetRef,
+					Weight: weight,
+					Target: epAddress.TargetRef,
 				}
 				upsServers = append(upsServers, ups)
 				adus[ep] = true
