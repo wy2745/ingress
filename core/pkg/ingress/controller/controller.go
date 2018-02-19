@@ -1476,29 +1476,21 @@ func (ic *GenericController) getEndpoints(
 	hz *healthcheck.Upstream) []ingress.Endpoint {
 
 	upsServers := []ingress.Endpoint{}
-	fmt.Println("-------------test")
 	requirement, err := labels.NewRequirement("app", selection.Equals, []string{"apptest"})
 	fmt.Println(err)
 	pods, err := ic.listers.Pod.Pods("default").List(labels.NewSelector().Add(*requirement))
-	data := make(map[string]*heapsterManager.MetricSet2)
-	fmt.Println("haha", ic.heapsterManager.DataSum())
+	data := make(map[string]int64)
 	datasum := ic.heapsterManager.DataSum()
+	sum := int64(0)
 	for i, _ := range pods {
 		for key, value := range *datasum {
-			fmt.Println("key:", key)
-			fmt.Println("PodName: ", pods[i].GetName())
 			if strings.Contains(key, pods[i].GetName()) {
-				data[pods[i].Status.PodIP] = value
+				data[pods[i].Status.PodIP] = value.MetricValues["cpu/usage"].IntValue
+				sum += value.MetricValues["cpu/usage"].IntValue
 				continue
 			}
 		}
 	}
-	for key, value := range data {
-		fmt.Println("key: ", key)
-		fmt.Println("value: ", value)
-	}
-
-	fmt.Println("--------------test-ok")
 
 	// avoid duplicated upstream servers when the service
 	// contains multiple port definitions sharing the same
@@ -1567,13 +1559,17 @@ func (ic *GenericController) getEndpoints(
 				if _, exists := adus[ep]; exists {
 					continue
 				}
+				fmt.Println("IP: ", epAddress.IP)
+				fmt.Println("load: ", data[epAddress.IP])
+				fmt.Println("sum: ", sum)
+				fmt.Println("weight: ", int(10*data[epAddress.IP]/sum))
 				ups := ingress.Endpoint{
 					Address:     epAddress.IP,
 					Port:        fmt.Sprintf("%v", targetPort),
 					MaxFails:    hz.MaxFails,
 					FailTimeout: hz.FailTimeout,
 					//在这里加入权重
-					Weight: weight,
+					Weight: int(10 * data[epAddress.IP] / sum),
 					Target: epAddress.TargetRef,
 				}
 				upsServers = append(upsServers, ups)
