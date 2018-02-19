@@ -1483,6 +1483,7 @@ func (ic *GenericController) getEndpoints(
 	datasum := *ic.heapsterManager.DataSum()
 	fmt.Println(pods)
 	fmt.Println(datasum)
+	fmt.Println(ic.heapsterManager.DataSum())
 	sum := int64(0)
 	fmt.Println("haha")
 	for i, _ := range pods {
