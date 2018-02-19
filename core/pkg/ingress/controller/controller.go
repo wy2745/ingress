@@ -1497,7 +1497,7 @@ func (ic *GenericController) getEndpoints(
 				fmt.Println("num:,", value.MetricValues["memory/usage"].IntValue)
 				sum += value.MetricValues["memory/usage"].IntValue
 				fmt.Println("sum2: ", sum)
-				continue
+				break
 			}
 		}
 		if ok == false {
