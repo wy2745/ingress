@@ -1484,6 +1484,8 @@ func (ic *GenericController) getEndpoints(
 	datasum := *ic.heapsterManager.DataSum()
 	for i, _ := range pods {
 		for key, value := range datasum {
+			fmt.Println("key:", key)
+			fmt.Println("PodName: ", pods[i].GetName())
 			if strings.Contains(key, pods[i].GetName()) {
 				data[pods[i].Status.PodIP] = value
 				continue
