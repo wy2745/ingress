@@ -1482,20 +1482,19 @@ func (ic *GenericController) getEndpoints(
 	data := make(map[string]int64)
 	datasum := *ic.heapsterManager.DataSum()
 	sum := int64(0)
-	ok := true
+	var ok bool
 	fmt.Println(pods)
 	for i, _ := range pods {
 		fmt.Println("i: ", i)
+		ok = false
 		for key, value := range datasum {
 			fmt.Println("Key: ", key)
 			fmt.Println("PodName: ", pods[i].GetName())
 			if strings.Contains(key, pods[i].GetName()) {
 				if value.MetricValues["memory/usage"] == nil {
-					ok = false
-					sum = int64(0)
-					fmt.Println("1OHNO")
 					break
 				}
+				ok = true
 				data[pods[i].Status.PodIP] = value.MetricValues["memory/usage"].IntValue
 				fmt.Println("sum1: ", sum)
 				fmt.Println("num:,", value.MetricValues["memory/usage"].IntValue)
@@ -1507,6 +1506,7 @@ func (ic *GenericController) getEndpoints(
 			}
 		}
 		if ok == false {
+			sum = int64(0)
 			fmt.Println("OH NO")
 			break
 		}
