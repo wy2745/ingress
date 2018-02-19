@@ -392,8 +392,8 @@ func (rm *realManager) housekeep(start, end time.Time) {
 			}
 		}
 		//处理数据，进行统计
-		//rm.consumeData(data)
-		rm.consumeData2Xlxs(data)
+		rm.consumeData(data)
+		//rm.consumeData2Xlxs(data)
 
 		//for k1,v1 :=range rm.data.historicalData{
 		//	glog.Info("pod--"+k1+"的历史数据")
