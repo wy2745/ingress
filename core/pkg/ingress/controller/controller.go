@@ -1481,6 +1481,8 @@ func (ic *GenericController) getEndpoints(
 	pods, err := ic.listers.Pod.Pods("default").List(labels.NewSelector().Add(*requirement))
 	data := make(map[string]int64)
 	datasum := *ic.heapsterManager.DataSum()
+	fmt.Println(pods)
+	fmt.Println(datasum)
 	sum := int64(0)
 	fmt.Println("haha")
 	for i, _ := range pods {
