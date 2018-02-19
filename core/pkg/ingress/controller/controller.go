@@ -1485,6 +1485,10 @@ func (ic *GenericController) getEndpoints(
 	for i, _ := range pods {
 		for key, value := range datasum {
 			if strings.Contains(key, pods[i].GetName()) {
+				if value.MetricValues["memory/usage"] == nil {
+					sum = int64(0)
+					break
+				}
 				data[pods[i].Status.PodIP] = value.MetricValues["memory/usage"].IntValue
 				fmt.Println("sum1: ", sum)
 				fmt.Println("num:,", value.MetricValues["memory/usage"].IntValue)
