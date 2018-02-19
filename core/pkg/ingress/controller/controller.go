@@ -1482,10 +1482,12 @@ func (ic *GenericController) getEndpoints(
 	data := make(map[string]int64)
 	datasum := *ic.heapsterManager.DataSum()
 	sum := int64(0)
+	ok := true
 	for i, _ := range pods {
 		for key, value := range datasum {
 			if strings.Contains(key, pods[i].GetName()) {
 				if value.MetricValues["memory/usage"] == nil {
+					ok = false
 					sum = int64(0)
 					break
 				}
@@ -1496,6 +1498,9 @@ func (ic *GenericController) getEndpoints(
 				fmt.Println("sum2: ", sum)
 				continue
 			}
+		}
+		if ok == false {
+			break
 		}
 	}
 
