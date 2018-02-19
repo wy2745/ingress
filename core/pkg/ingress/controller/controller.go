@@ -1480,11 +1480,23 @@ func (ic *GenericController) getEndpoints(
 	requirement, err := labels.NewRequirement("app", selection.Equals, []string{"apptest"})
 	fmt.Println(err)
 	pods, err := ic.listers.Pod.Pods("default").List(labels.NewSelector().Add(*requirement))
+	data := make(map[string]*heapsterManager.MetricSet2)
+	datasum := *ic.heapsterManager.DataSum()
 	for i, _ := range pods {
-		fmt.Println(pods[i].GetName())
-		fmt.Println(pods[i].Status.PodIP)
+		for key, value := range datasum {
+			if strings.Contains(key, pods[i].GetName()) {
+				data[pods[i].Status.PodIP] = value
+				continue
+			}
+		}
 	}
+	for key, value := range data {
+		fmt.Println("key: ", key)
+		fmt.Println("value: ", value)
+	}
+
 	fmt.Println("--------------test-ok")
+
 	// avoid duplicated upstream servers when the service
 	// contains multiple port definitions sharing the same
 	// targetport.

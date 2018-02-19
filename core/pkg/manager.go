@@ -6,13 +6,14 @@ import (
 	"k8s.io/heapster/metrics/core"
 
 	"container/list"
-	"github.com/golang/glog"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/tealeg/xlsx"
 	"io"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/tealeg/xlsx"
 )
 
 const (
@@ -50,6 +51,7 @@ func init() {
 type Manager interface {
 	Start()
 	Stop()
+	DataSum() *map[string]*MetricSet2
 }
 
 type realManager struct {
@@ -149,6 +151,10 @@ func (rm *realManager) Start() {
 
 func (rm *realManager) Stop() {
 	rm.stopChan <- struct{}{}
+}
+
+func (rm *realManager) DataSum() *map[string]*MetricSet2 {
+	return &rm.data.sum
 }
 
 func (rm *realManager) Housekeep() {
