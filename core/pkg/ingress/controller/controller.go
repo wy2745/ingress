@@ -35,7 +35,6 @@ import (
 	extensions "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -1476,41 +1475,33 @@ func (ic *GenericController) getEndpoints(
 	hz *healthcheck.Upstream) []ingress.Endpoint {
 
 	upsServers := []ingress.Endpoint{}
-	requirement, err := labels.NewRequirement("app", selection.Equals, []string{"apptest"})
-	fmt.Println(err)
-	pods, err := ic.listers.Pod.Pods("default").List(labels.NewSelector().Add(*requirement))
-	data := make(map[string]int64)
-	datasum := *ic.heapsterManager.DataSum()
-	sum := int64(0)
-	var ok bool
-	fmt.Println(pods)
-	for i, _ := range pods {
-		fmt.Println("i: ", i)
-		ok = false
-		for key, value := range datasum {
-			fmt.Println("Key: ", key)
-			fmt.Println("PodName: ", pods[i].GetName())
-			if strings.Contains(key, pods[i].GetName()) {
-				if value.MetricValues["memory/usage"] == nil {
-					break
-				}
-				ok = true
-				data[pods[i].Status.PodIP] = value.MetricValues["memory/usage"].IntValue
-				fmt.Println("sum1: ", sum)
-				fmt.Println("num:,", value.MetricValues["memory/usage"].IntValue)
-				sum += value.MetricValues["memory/usage"].IntValue
-				fmt.Println("sum2: ", sum)
-				break
-			} else {
-				continue
-			}
-		}
-		if ok == false {
-			sum = int64(0)
-			fmt.Println("OH NO")
-			break
-		}
-	}
+	// requirement, err := labels.NewRequirement("app", selection.Equals, []string{"apptest"})
+	// fmt.Println(err)
+	// pods, err := ic.listers.Pod.Pods("default").List(labels.NewSelector().Add(*requirement))
+	// data := make(map[string]int64)
+	// datasum := *ic.heapsterManager.DataSum()
+	// sum := int64(0)
+	// var ok bool
+	// for i, _ := range pods {
+	// 	ok = false
+	// 	for key, value := range datasum {
+	// 		if strings.Contains(key, pods[i].GetName()) {
+	// 			if value.MetricValues["memory/usage"] == nil {
+	// 				break
+	// 			}
+	// 			ok = true
+	// 			data[pods[i].Status.PodIP] = value.MetricValues["memory/usage"].IntValue
+	// 			sum += value.MetricValues["memory/usage"].IntValue
+	// 			break
+	// 		} else {
+	// 			continue
+	// 		}
+	// 	}
+	// 	if ok == false {
+	// 		sum = int64(0)
+	// 		break
+	// 	}
+	// }
 
 	// avoid duplicated upstream servers when the service
 	// contains multiple port definitions sharing the same
@@ -1579,16 +1570,11 @@ func (ic *GenericController) getEndpoints(
 				if _, exists := adus[ep]; exists {
 					continue
 				}
-				if sum == 0 {
-					weight = 5
-				} else {
-					weight = int(10 * data[epAddress.IP] / sum)
-				}
-				fmt.Println(data)
-				fmt.Println("IP: ", epAddress.IP)
-				fmt.Println("load: ", data[epAddress.IP])
-				fmt.Println("sum: ", sum)
-				fmt.Println("weight: ", weight)
+				// if sum == 0 {
+				// 	weight = 5
+				// } else {
+				// 	weight = int(10 * data[epAddress.IP] / sum)
+				// }
 				ups := ingress.Endpoint{
 					Address:     epAddress.IP,
 					Port:        fmt.Sprintf("%v", targetPort),
