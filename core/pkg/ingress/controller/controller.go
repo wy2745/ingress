@@ -35,6 +35,7 @@ import (
 	extensions "k8s.io/api/extensions/v1beta1"
 	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -225,7 +226,9 @@ func (this *kubeletMetricsSource) handleKubernetesContainer(cName, ns, podName s
 	var metricSetKey string
 	if cName == infraContainerName {
 		if strings.Contains(podName, testapp) {
-			metricSetKey = core.PodKey(ns, podName)
+			//metric 名字修改
+			//metricSetKey = core.PodKey(ns, podName)
+			metricSetKey = podName
 			cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePod
 		} else {
 			return "", false
@@ -1467,6 +1470,25 @@ func (ic *GenericController) createServers(data []*extensions.Ingress,
 	return servers
 }
 
+func (ic *GenericController) balanceLoad() {
+	requirement, _ := labels.NewRequirement("app", selection.Equals, []string{"apptest"})
+	pods, _ := ic.listers.Pod.Pods("default").List(labels.NewSelector().Add(*requirement))
+	data := make(map[string]int64)
+	hdata := *ic.heapsterManager.HistoricalData()
+	sum := int64(0)
+	for i, _ := range pods {
+		value := hdata[pods[i].GetName()].Back().Value.(*heapsterManager.MetricSet2)
+		data[pods[i].Status.PodIP] = value.MetricValues["memory/usage"].IntValue
+		sum += value.MetricValues["memory/usage"].IntValue
+	}
+}
+func (ic *GenericController) balanceLoadWithNode() {
+
+}
+func (ic *GenericController) balanceLoadWithDb() {
+
+}
+
 // getEndpoints returns a list of <endpoint ip>:<port> for a given service/target port combination.
 func (ic *GenericController) getEndpoints(
 	s *kube_api.Service,
@@ -1475,6 +1497,7 @@ func (ic *GenericController) getEndpoints(
 	hz *healthcheck.Upstream) []ingress.Endpoint {
 
 	upsServers := []ingress.Endpoint{}
+
 	// requirement, err := labels.NewRequirement("app", selection.Equals, []string{"apptest"})
 	// fmt.Println(err)
 	// pods, err := ic.listers.Pod.Pods("default").List(labels.NewSelector().Add(*requirement))

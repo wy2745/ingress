@@ -52,6 +52,7 @@ type Manager interface {
 	Start()
 	Stop()
 	DataSum() *map[string]*MetricSet2
+	HistoricalData() *map[string]*list.List
 }
 
 type realManager struct {
@@ -94,7 +95,7 @@ func NewManager(source core.MetricsSource, processors []core.DataProcessor, reso
 
 	var stringOrder1 []string
 	var stringOrder2 []string
-	for _, value := range core.StandardMetrics {
+	for _, value := range core.RateMetrics {
 		stringOrder1 = append(stringOrder1, value.Name)
 	}
 	for _, value := range core.LabeledMetrics {
@@ -155,6 +156,10 @@ func (rm *realManager) Stop() {
 
 func (rm *realManager) DataSum() *map[string]*MetricSet2 {
 	return &rm.data.sum
+}
+
+func (rm *realManager) HistoricalData() *map[string]*list.List {
+	return &rm.data.historicalData
 }
 
 func (rm *realManager) Housekeep() {
@@ -239,15 +244,15 @@ func (rm *realManager) consumeData2Xlxs(batch *core.DataBatch) {
 		value, ok := rm.data.historicalData[metricSourceName]
 		if !ok {
 			value = list.New()
-			value.PushBack(metric)
+			value.PushBack(copyMetricSet(metric))
 			rm.data.historicalData[metricSourceName] = value
 		} else {
 			if value.Len() < DataSumSize {
-				value.PushBack(metric)
+				value.PushBack(copyMetricSet(metric))
 			} else {
 				s1 := value.Front()
 				value.Remove(s1)
-				value.PushBack(metric)
+				value.PushBack(copyMetricSet(metric))
 			}
 		}
 		var sheet *xlsx.Sheet
