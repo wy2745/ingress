@@ -95,7 +95,10 @@ func NewManager(source core.MetricsSource, processors []core.DataProcessor, reso
 
 	var stringOrder1 []string
 	var stringOrder2 []string
-	for _, value := range core.RateMetrics {
+	for _, value := range core.StandardMetrics {
+		stringOrder1 = append(stringOrder1, value.Name)
+	}
+	for _, value := range core.AdditionalMetrics {
 		stringOrder1 = append(stringOrder1, value.Name)
 	}
 	for _, value := range core.LabeledMetrics {
