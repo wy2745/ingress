@@ -61,7 +61,10 @@ modified ingress controller finishes 10000 requests with no 503 request, and the
  \caption{Request summary of initialization pattern}
  \label{table:request_summary1}
 \end{table}
-Throughout all cases, the FPS of full reconstruction policy is between 100 and 200.
+
+Scaling pattern happens when administrator decides to scale up test applications because the workload is too large for current number of endpoint to handle.
+To emulate this pattern, we first deploy endpoint1 in node3 and endpoint2 in node3 and generate high workload to keep these two endpoints in high-load state but not overload.
+Then we deploy endpoint3 in node5 and increase the workload to the size that three endpoints can handle ideally. all cases, the FPS of full reconstruction policy is between 100 and 200.
 \name{} shows a worse performance than \gvirt{} in cases without the Massive Update Issue, while achieving a better performance when the issue occurs.
 As we discussed in section~\ref{subsec:recon_policy}, all 512 pages are applied with the relaxed mechanism, so full reconstruction brings more overhead
 on reconstructing non-accessed pages, which is the reason for cases with little page update showing poor performance.

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.2.14)  9 MAR 2018 15:31
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.2.14)  9 MAR 2018 16:27
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -476,7 +476,7 @@ Package pdftex.def Info: images/data2.png used on input line 39.
 (pdftex.def)             Requested size: 211.3883pt x 139.82309pt.
 
 
-LaTeX Warning: Reference `subsec:recon_policy' on page 7 undefined on input line 66.
+LaTeX Warning: Reference `subsec:recon_policy' on page 7 undefined on input line 69.
 
 Package epstopdf Info: Source file: <figure/static.eps>
 (epstopdf)                    date: 2016-03-03 13:56:56
@@ -485,12 +485,12 @@ Package epstopdf Info: Source file: <figure/static.eps>
 (epstopdf)                    date: 2017-12-12 15:17:58
 (epstopdf)                    size: 8985 bytes
 (epstopdf)             Command: <repstopdf --outfile=figure/static-eps-converted-to.pdf figure/static.eps>
-(epstopdf)             \includegraphics on input line 71.
+(epstopdf)             \includegraphics on input line 74.
 Package epstopdf Info: Output file is already uptodate.
 <figure/static-eps-converted-to.pdf, id=41, 361.35pt x 252.945pt>
 File: figure/static-eps-converted-to.pdf Graphic file (type pdf)
  <use figure/static-eps-converted-to.pdf>
-Package pdftex.def Info: figure/static-eps-converted-to.pdf used on input line 71.
+Package pdftex.def Info: figure/static-eps-converted-to.pdf used on input line 74.
 (pdftex.def)             Requested size: 211.3883pt x 147.97029pt.
  [7 <./images/data1.png> <./images/data2.png> <./figure/static-eps-converted-to.pdf>]
 Package epstopdf Info: Source file: <figure/partial.eps>
@@ -500,12 +500,12 @@ Package epstopdf Info: Source file: <figure/partial.eps>
 (epstopdf)                    date: 2017-12-12 15:17:58
 (epstopdf)                    size: 8604 bytes
 (epstopdf)             Command: <repstopdf --outfile=figure/partial-eps-converted-to.pdf figure/partial.eps>
-(epstopdf)             \includegraphics on input line 87.
+(epstopdf)             \includegraphics on input line 90.
 Package epstopdf Info: Output file is already uptodate.
  <figure/partial-eps-converted-to.pdf, id=53, 361.35pt x 252.945pt>
 File: figure/partial-eps-converted-to.pdf Graphic file (type pdf)
  <use figure/partial-eps-converted-to.pdf>
-Package pdftex.def Info: figure/partial-eps-converted-to.pdf used on input line 87.
+Package pdftex.def Info: figure/partial-eps-converted-to.pdf used on input line 90.
 (pdftex.def)             Requested size: 211.3883pt x 147.97029pt.
 Package epstopdf Info: Source file: <figure/linux.eps>
 (epstopdf)                    date: 2016-03-03 13:56:56
@@ -514,12 +514,12 @@ Package epstopdf Info: Source file: <figure/linux.eps>
 (epstopdf)                    date: 2017-12-12 15:17:59
 (epstopdf)                    size: 7305 bytes
 (epstopdf)             Command: <repstopdf --outfile=figure/linux-eps-converted-to.pdf figure/linux.eps>
-(epstopdf)             \includegraphics on input line 106.
+(epstopdf)             \includegraphics on input line 109.
 Package epstopdf Info: Output file is already uptodate.
  <figure/linux-eps-converted-to.pdf, id=54, 361.35pt x 252.945pt>
 File: figure/linux-eps-converted-to.pdf Graphic file (type pdf)
  <use figure/linux-eps-converted-to.pdf>
-Package pdftex.def Info: figure/linux-eps-converted-to.pdf used on input line 106.
+Package pdftex.def Info: figure/linux-eps-converted-to.pdf used on input line 109.
 (pdftex.def)             Requested size: 211.3883pt x 147.97029pt.
 Package epstopdf Info: Source file: <figure/windows.eps>
 (epstopdf)                    date: 2016-03-03 13:56:54
@@ -528,37 +528,41 @@ Package epstopdf Info: Source file: <figure/windows.eps>
 (epstopdf)                    date: 2017-12-12 15:17:59
 (epstopdf)                    size: 6903 bytes
 (epstopdf)             Command: <repstopdf --outfile=figure/windows-eps-converted-to.pdf figure/windows.eps>
-(epstopdf)             \includegraphics on input line 113.
+(epstopdf)             \includegraphics on input line 116.
 Package epstopdf Info: Output file is already uptodate.
  <figure/windows-eps-converted-to.pdf, id=55, 361.35pt x 252.945pt>
 File: figure/windows-eps-converted-to.pdf Graphic file (type pdf)
  <use figure/windows-eps-converted-to.pdf>
-Package pdftex.def Info: figure/windows-eps-converted-to.pdf used on input line 113.
+Package pdftex.def Info: figure/windows-eps-converted-to.pdf used on input line 116.
 (pdftex.def)             Requested size: 211.3883pt x 147.97029pt.
-) (./related.tex
+ [8 <./figure/partial-eps-converted-to.pdf> <./figure/linux-eps-converted-to.pdf> <./figure/windows-eps-converted-to.pdf>]) (./related.tex
 Missing character: There is no â in font ptmr7t!
 Missing character: There is no € in font ptmr7t!
 Missing character: There is no   in font ptmr7t!
- [8 <./figure/partial-eps-converted-to.pdf> <./figure/linux-eps-converted-to.pdf> <./figure/windows-eps-converted-to.pdf>]) (./conclusion.tex [9]) (./ack.tex) (./HSCS.bbl
+ [9]) (./conclusion.tex) (./ack.tex) (./HSCS.bbl
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 5.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 5.
-
-Underfull \hbox (badness 1708) in paragraph at lines 60--66
-[]\OT1/ptm/m/sc/8 Duato, J., Pena, A. J., Silla, F., Mayo, R., and
- []
 
 
 Package balance Warning: You have called \balance in second column
 (balance)                Columns might not be balanced.
 
 [10]
+Underfull \hbox (badness 1708) in paragraph at lines 60--66
+[]\OT1/ptm/m/sc/8 Duato, J., Pena, A. J., Silla, F., Mayo, R., and
+ []
+
+
 Underfull \hbox (badness 1163) in paragraph at lines 102--106
 []\OT1/ptm/m/sc/8 Kivity, A., Ka-may, Y., Laor, D., Lublin, U., and
  []
 
-) [11] (./HSCS.aux)
+)
+Overfull \vbox (0.77197pt too high) has occurred while \output is active []
+
+ [11] (./HSCS.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -572,7 +576,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  38i,14n,39p,1231b,389s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2016/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on HSCS.pdf (11 pages, 264562 bytes).
+Output written on HSCS.pdf (11 pages, 267078 bytes).
 PDF statistics:
  118 PDF objects out of 1000 (max. 8388607)
  74 compressed objects within 1 object stream

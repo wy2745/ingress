@@ -1,13 +1,13 @@
 # Fdb version 3
-["bibtex HSCS"] 1520578687 "HSCS.aux" "HSCS.bbl" "HSCS" 1520580708
+["bibtex HSCS"] 1520584060 "HSCS.aux" "HSCS.bbl" "HSCS" 1520584062
   "/usr/local/texlive/2016/texmf-dist/bibtex/bst/base/acm.bst" 1292289607 21064 c61a48664f3c347ce7f73c1a6a530506 ""
-  "HSCS.aux" 1520580707 6248 57dc3267d4e2dbf826c061e6f99c78e7 ""
+  "HSCS.aux" 1520584062 6249 60ff09f97c4ad531ee1a63a992db7347 ""
   "HSCS.bcf" 0 -1 0 ""
   "HSCS.bib" 1456984618 11165 e8830326ad88e4b7727f2cea3bc06eb3 ""
   (generated)
   "HSCS.blg"
   "HSCS.bbl"
-["pdflatex"] 1520580706 "HSCS.tex" "HSCS.pdf" "HSCS" 1520580708
+["pdflatex"] 1520584060 "HSCS.tex" "HSCS.pdf" "HSCS" 1520584062
   "/usr/local/texlive/2016/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2016/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
   "/usr/local/texlive/2016/texmf-dist/fonts/tfm/adobe/symbol/psyr.tfm" 1136768653 1408 5937f58aa508ea2cea4901c07d10f5fe ""
@@ -105,9 +105,9 @@
   "/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1487054511 1888048 f2c5faed5981a516f406b2ccc20bff71 ""
   "/usr/local/texlive/2016/texmf-var/web2c/pdftex/pdflatex.fmt" 1487054578 3873397 b8b472927287d640b5aa25fe3220c55f ""
   "/usr/local/texlive/2016/texmf.cnf" 1463979140 577 2938757e76f31531e65cc647e3507693 ""
-  "HSCS.aux" 1520580707 6248 57dc3267d4e2dbf826c061e6f99c78e7 ""
-  "HSCS.bbl" 1520578688 5707 0c638db214700c21b9d1777899d5da13 "bibtex HSCS"
-  "HSCS.tex" 1520580705 1293 8f80e06725d02e9966cb7dbd8df3dfb9 ""
+  "HSCS.aux" 1520584062 6249 60ff09f97c4ad531ee1a63a992db7347 ""
+  "HSCS.bbl" 1520584060 5707 0c638db214700c21b9d1777899d5da13 "bibtex HSCS"
+  "HSCS.tex" 1520584058 1293 8f80e06725d02e9966cb7dbd8df3dfb9 ""
   "abstract.tex" 1519864996 784 4b078696372c3491de43ecb387761b36 ""
   "ack.tex" 1456984618 474 5532e144c8482db910b6f59e303f1a0b ""
   "authors.tex" 1456984616 543 3d554d4b5516d8b1428a220e2f3d3b73 ""
@@ -115,7 +115,7 @@
   "benchmark.tex" 1520409259 16837 0d930229141dfb7412510624f65ab253 ""
   "conclusion.tex" 1456984620 1785 f21defe9b3d03f03a023227f6ba8a21b ""
   "design_and_impl.tex" 1520476373 10680 4ee714b55ea5d40910ea21e9b0f0a9eb ""
-  "eval.tex" 1520578682 9575 a71f8883f8bc326ef7ffab072914b162 ""
+  "eval.tex" 1520584054 9998 d0d618cb4c2d362894765337b227cfe5 ""
   "figure/linux.eps" 1456984616 24828 34298fecc1e6301ebb05f69008412d2a ""
   "figure/partial.eps" 1456984616 31495 bfdd410782f46d2e7805ba887d7bae32 ""
   "figure/static.eps" 1456984616 35619 c752b7c28d44428218f4fcfd2f7ae4cb ""
@@ -131,7 +131,7 @@
   "related.tex" 1456984614 7130 2b79af19e8dfb08812e9064ba5d9dc1d ""
   "usenix.sty" 1456984618 2677 36a8f966fe5f8e6bb1128ef8da2c008c ""
   (generated)
-  "HSCS.log"
-  "/usr/local/texlive/2016/texmf-dist/tex/latex/tools/.tex"
   "HSCS.pdf"
   "HSCS.aux"
+  "/usr/local/texlive/2016/texmf-dist/tex/latex/tools/.tex"
+  "HSCS.log"
