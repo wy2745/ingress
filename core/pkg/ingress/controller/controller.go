@@ -227,7 +227,7 @@ func (this *kubeletMetricsSource) handleKubernetesContainer(cName, ns, podName s
 	if cName == infraContainerName {
 		if strings.Contains(podName, testapp) {
 			//metric 名字修改
-			//metricSetKey = core.PodKey(ns, podName)
+			metricSetKey = core.PodKey(ns, podName)
 			metricSetKey = podName
 			cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePod
 		} else {
@@ -236,8 +236,7 @@ func (this *kubeletMetricsSource) handleKubernetesContainer(cName, ns, podName s
 
 	} else {
 		if strings.Contains(podName, testapp) {
-			//metricSetKey = core.PodContainerKey(ns, podName, cName)
-			metricSetKey = podName
+			metricSetKey = core.PodContainerKey(ns, podName, cName)
 			cMetrics.Labels[core.LabelMetricSetType.Key] = core.MetricSetTypePodContainer
 			cMetrics.Labels[core.LabelContainerName.Key] = cName
 			cMetrics.Labels[core.LabelContainerBaseImage.Key] = c.Spec.Image
