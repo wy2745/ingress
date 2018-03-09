@@ -1,0 +1,29 @@
+\section{Background}
+\label{sec:background}
+
+Performance of web services is sensitive to system metrics of their backend servers, in container-based cluster, that is backend containers. For convenience, we called the backend containers as endpoints in this paper. This section first introduces the current load-balancing solution in Kubernetes, and then points out factors that affect performance of web services in container-based cluster.
+
+\subsection{Ingress controller}
+\label{subsec:ingress_controller}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.45\textwidth]{images/ingress_controller.png}\\
+  \caption{Workflow of ingress controller}
+  \label{fig:ingress_controller}
+\end{figure}
+\hspace{0pt}
+
+Figure~{\ref{fig:ingress_controller}} shows the workflow of kubernetes load-balancing component -- ingress controller: To balance network workload, ingress controller focuses on two part, one is to keep track of the IP and number change of endpoints so that it can update traffic rules in time to guarantee accuracy. The other part is watching ingress to update load-balancing strategy. Ingress is a resource describing inbound rules for connections to reach endpoints. With correct status of endpoints and a configured ingress, ingress controller sets up appropriate traffic rules for its built-in loadbalancer(nginx). Finally, the loadbalancer dispatches requests to suitable endpoints according to configured rules, balancing load across endpoints.
+
+\subsection{Influencing factors}
+\label{subsec:Influencing_factors}
+
+Factors that affect the performance include CPU usage, memory usage, network usage, sharing problem and locality.
+Papers have demonstrated that servers with high usage in CPU, memory or network will perform badly, and as a result, it causes delay on requests processing. Things are same when it comes to endpoints. Thus, if we demand high performance for web application, we?d better even load of each pod and reduce overhead endpoints as many as possible.
+Sharing problem occurs when several endpoints share one database. Traditionally, developers tend to reduce pressure of database by dividing it into several databases and synchronize data between them. Therefore, it is common for an endpoint to access a database that is not only the same as some endpoints, but also different from others. Under this circumstance, performance of web applications can be improved through reducing race between endpoints that share the same database.
+Locality means that the placement of endpoints may affect their performance. Though containers are claimed to isolate resource from each other, papers still show that when two or more endpoints are placed in the same node, the delay appears. More and more, although under circumstance that an endpoint monopolizes a node, it still remains possibility for delay when the node is in high-load status because of some system processes. So the locality should also be considered for a better load-balancing performance.
+
+\subsection{Shortcoming of ingress controller}
+\label{subsec:Shortcoming}
+Rather than balancing load, ingress controller concentrates more on linking ingress to nginx features like session affinity to let users to custom their load-balancing algorithm smoothly in kubernetes. However, its configurable algorithms are simply based on static algorithms like round\_robin, which do not consider influencing factors mentioned above. To address this, this paper presents an alternative basic algorithm to ingress controller, that is a dynamic load algorithm that takes these factors and request information into consideration.

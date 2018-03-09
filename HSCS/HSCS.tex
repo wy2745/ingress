@@ -1,0 +1,61 @@
+\documentclass[letterpaper,twocolumn,10pt]{article}
+\usepackage{usenix,epsfig,endnotes}
+\usepackage{enumitem}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{color,soul}
+\usepackage{marginnote}
+\usepackage{framed}
+\usepackage{balance}
+\usepackage{amsmath}
+\usepackage{algorithm} %ctan.org\pkg\algorithms
+\usepackage{algpseudocode}
+
+\definecolor{myyellow}{rgb}{1.0, 0.98, 0.77}
+\sethlcolor{myyellow}
+
+\setlength{\marginparwidth}{0.5in}
+
+\begin{document}
+
+%don't want date printed
+\date{}
+
+%some useful commands
+\input{prolog.tex}
+
+%make title bold and 14 pt font (Latex default is non-bold, 16 pt)
+\title{\Large \bf Boosting GPU Virtualization Performance with Hybrid
+Shadow Page Tables}
+
+\input{authors.tex}
+
+\maketitle
+
+% Use the following at camera-ready time to suppress page numbers.
+% Comment it out when you first submit the paper for review.
+%\thispagestyle{empty}
+
+\input{abstract.tex}
+\input{intro.tex}
+\input{background.tex}
+\input{benchmark.tex}
+\input{design_and_impl.tex}
+\input{eval.tex}
+\input{related.tex}
+\input{conclusion.tex}
+\input{ack.tex}
+
+\balance
+{\footnotesize \bibliographystyle{acm}
+\bibliography{HSCS}}
+
+
+%\theendnotes
+
+\end{document}

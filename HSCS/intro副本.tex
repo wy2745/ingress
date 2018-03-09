@@ -1,0 +1,83 @@
+\section{Introduction}
+\label{sec:introduction}
+
+The emergence of HPC cloud~\cite{vecchiola2009high} has shifted many
+computation-intensive workloads such as machine learning~\cite{lopes2011gpumlib}, 
+molecular dynamics simulations~\cite{yang2007gpu}  and media transcoding to
+cloud environments. This necessitates the use of GPU to boost the performance
+of such computation-hungry applications, resulting in a new computing
+paradigm called GPU cloud (such as Amazon's GPU cloud~\cite{aws-hpc}).
+Hence, it is now vitally important to provide efficient GPU virtualization
+to provision elastic GPU resources to multiple users.
+
+\iffalse
+As virtualization technology has been successfully applied to a variety of devices, the \gpu{} has become an indispensable building block within virtualization systems. This has lead to the scope that its applicability being greatly expanded from graphic computing acceleration to high performance computing. The current standard from many parallel applications choose \gpu{}s for general purpose computing (GPGPU)~{\cite{luebke2006gpgpu}}, such as machine learning~{\cite{lopes2011gpumlib}} and molecular dynamics simulations~\cite{yang2007gpu}. At the same time, virtualization technology has significantly influenced how resources are managed in cloud data center. \gpu{} virtualization extends today's elastic resource management capability from CPU to \gpu{}, which enables efficient hosting of \gpu{} workloads within cloud and data center environment.
+\fi
+
+To address this challenge, two recent full GPU virtualization techniques, \gvirt{}~{\cite{tian2014full}} and GPUvm~{\cite{suzuki2014gpuvm}}, are proposed 
+respectively. \gvirt{} is the first open-source product-level full GPU virtualization approach based on Xen hypervisor~{\cite{barham2003xen}} for Intel GPUs, while GPUvm provides a \gpu{} virtualization approach on the NVIDIA card. 
+This paper mainly focuses on \gvirt{} due to its open-source availability.
+Specifically,  \gvirt{} presents a v\gpu{} instance to each VM to run native graphics driver,
+which achieves high performance and good scalability for \gpu{}-intensive workloads.
+
+\iffalse
+\hspace{0pt}
+In order to compare the performance of different solutions, many GPU benchmarks have been introduced, although they normally focus on the graphics ability of cards~{\cite{website:3dmark}}. As \gpu{} has been applied in the filed of generous purpose computing, there are some tools implemented to measure the performance on GPGPU applications, such as Rodinia~{\cite{che2009rodinia}} and Parboil~{\cite{stratton2012parboil}}. With the growing demand of hosting online video stream, \gpu{}'s media performance has become another concern for service providers. For example, video sharing websites like YouTube need to transcode user-uploaded video into different qualities to offer smooth playback experience. However, there is no benchmark for this specific workload and most media processing applications just use CPU instructions instead of \gpu{}.
+
+\fi
+
+While \gvirt{} has made an important first step to provide full GPU virtualization,
+our measurement shows that it still incurs non-trivial overhead for media transcoding workloads.
+Specifically, we build \benchmark{} using Intel's MSDK (Media Software Development Kit)
+to characterize the performance of \gvirt{}. Our analysis uncovers that \gvirt{} still suffers from
+non-trivial performance slowdown due to an issue called \textit{Massive Update Issue}.
+This is caused by frequent updates on guest page tables, which lead to 
+excessive VM-exits
+to the hypervisor to synchronize the shadow page table with the guest page table.
+
+To address the Massive Update Issue, this paper introduces \name{}, which provides a hybrid page table shadowing 
+scheme to provide optimized full GPU virtualization based on Xen hypervisor for Intel GPUs. Inspired by the \gpu{} 
+programming model, we introduce a new asynchronous mechanism, namely relaxed page table shadowing, 
+which removes trap-and-emulation and thus reduces the overhead of massive page table's modifications. 
+To minimize the overhead of making guest and shadow page tables consistent, we combine the two mechanisms 
+into a adaptive hybrid page table shadowing scheme, which take advantage of both the traditional strict and 
+the new relaxed page table shadowing. When there are infrequent page table accesses, 
+\name{} works in strict page table shadowing; once the \name{} detects the guest VM is frequently updating 
+the page table, it will switch to the relaxed page table shadowing.
+
+One critical issue of using the relaxed page table shadowing scheme is to reconstruct the
+shadow pages when shadow pages are inconsistent with guest pages. 
+To better understand the tradeoff of different reconstruction policies, 
+we implement and evaluate four page table reconstruction policies: full reconstruction, static partial reconstruction, dynamic partial reconstruction and dynamic segmented partial reconstruction. Our analysis shows that the last one usually has better performance than the others, 
+which is thus used as the default policy for \name{}. 
+
+We have implemented \name{} based on \gvirt{}, which comprises 600 LoCs. 
+Experiments using GMedia on an Intel GPU card show that \name{} can achieve 
+up to 13x performance improvement compared to \gvirt{}, and up to 85\% native 
+performance for multi-thread media transcoding. 
+Our analysis shows that \name{} wins due to the reduction of up to 69\% 
+VM-exits. 
+
+In summary, this paper makes the following contributions:
+
+\begin{itemize}
+
+\item A \gpu{}-enabled benchmark for media transcoding performance (GMedia), by invoking functions 
+from Intel MSDK to evaluate and collect the  performance data on Intel's \gpu{} platforms. 
+
+  \item A relaxed page table shadowing mechanism as well as a hybrid shadow page table scheme, 
+  which combines the strict page table shadowing with the relaxed page table shadowing.
+
+  \item Four reconstruction policies: the full reconstruction policy, static partial reconstruction policy, dynamic partial reconstruction policy, and the dynamic segmented partial reconstruction policy for relaxed page table shadowing mechanism.
+ % \item A \gpu{}-enabled benchmark for media transcoding performance (GMedia), by invoking functions from Intel MSDK to evaluate and report the  performance on Intel's \gpu{} platforms.
+  
+ \item An evaluation showing that \name{} achieves up to 85\% native performance for multi-thread media transcoding and a 13x speedup over \gvirt{}.
+
+\end{itemize}
+
+The rest of the paper is organized as follows: Section~\ref{sec:background} describes some background information 
+on \gvirt{} and \gpu{} programming model. Section~\ref{sec:benchmark} presents our benchmark for media transcoding 
+and discusses the Massive Update Issue in detail, followed by the design and implementation of \name{} 
+ In section~\ref{sec:design_and_impl}. Then, section~\ref{sec:evaluation} evaluates the \name{} and
+ section~\ref{sec:related_work} discusses the related work. Finally, section~\ref{sec:conclusion} concludes with
+ a brief discussion on future work. 

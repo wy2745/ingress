@@ -1,0 +1,6 @@
+PWD /Users/panda/Documents/论文相关/HSCS/HSCS
+INPUT /usr/local/texlive/2016/texmf.cnf
+INPUT /usr/local/texlive/2016/texmf-dist/web2c/texmf.cnf
+INPUT /usr/local/texlive/2016/texmf-var/web2c/pdftex/pdflatex.fmt
+INPUT design_and_impl.tex
+OUTPUT design_and_impl.log

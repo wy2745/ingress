@@ -1,0 +1,30 @@
+\subsection*{Abstract}
+\hspace{0pt}
+The increasing adoption of Graphic Process Unit (GPU) to computation-intensive workloads
+has stimulated a new computing paradigm called GPU cloud (e.g., Amazon's GPU Cloud), which
+necessitates the sharing of GPU resources to multiple tenants in a cloud. 
+However, state-of-the-art GPU virtualization techniques such as \gvirt{} still suffer 
+from non-trivial performance overhead for graphics memory-intensive workloads 
+involving frequent page table updates.
+
+To understand such overhead, this paper first presents GMedia, a media benchmark, 
+and uses it to analyze the causes of such overhead.  
+Our analysis shows that frequent updates to guest VM's page tables causes 
+excessive updates to the shadow page table in the hypervisor, due to the need 
+to guarantee the consistency between guest page table and shadow page table. 
+To this end, this paper proposes \name{}\footnote{The source code of gHyvi will be available at \url{https://01.org/igvt-g}.}, an optimized GPU virtualization scheme 
+based on \gvirt{}, which uses adaptive hybrid page table shadowing that 
+combines strict and relaxed page table schemes. 
+By significantly reducing trap-and-emulation due to page table updates, \name{} significantly improves \gvirt{}'s performance for memory-intensive 
+GPU workloads. Evaluation using GMedia shows that \name{} can achieve up to 13x performance 
+improvement compared to \gvirt{}, and up to 85\% native performance for multi-thread media 
+transcoding.
+
+\iffalse
+
+\hspace{0pt}
+The Graphic Process Unit (GPU) has become an indispensable building block in current virtual execution environment. For instance, \gvirt{} is one of the cutting edge full GPU virtualization solutions on Xen Hypervisor. However, it updates the shadow page table instantly after the guest page table is modified, which could incur big performance degradation within the graphics memory intensive workloads, such as media transcoding.
+
+This paper presents a detailed analysis on \textit{Massive Update Issue} using a media performance benchmark, and introduces \name{}, an optimized full GPU virtualization solution based on Xen hypervisor, with adaptive hybrid page table shadowing scheme. By combining strict and relaxed page table shadowing scheme, \name{} improves \gvirt{}'s performance for memory intensive GPU workloads with frequent page table modification by removing the constraints of trap-and-emulation. Experiments on the benchmark GMedia show that \name{} can achieve up to 13x performance improvement compared to \gvirt{}, and up to 85\% native performance for multi-thread media transcoding.
+
+\fi

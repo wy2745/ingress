@@ -1,0 +1,135 @@
+----testing result for 1ch-480p-test ----
+FPS data: 315.26
+TOTAL= 1 SUM= 315.26 AvgFPS= 315.26
+ 
+----testing result for 5ch-480p-test ----
+FPS data: 96.71 95.90 94.87 95.05 96.38
+TOTAL= 5 SUM= 478.91 AvgFPS= 95.782
+ 
+----testing result for 6ch-480p-test ----
+FPS data: 80.83 79.73 81.20 81.32 81.54 79.79
+TOTAL= 6 SUM= 484.41 AvgFPS= 80.735
+ 
+----testing result for 10ch-480p-test ----
+FPS data: 48.55 48.90 48.43 48.84 48.65 48.81 48.53 47.89 48.48 49.26
+TOTAL= 10 SUM= 486.34 AvgFPS= 48.634
+ 
+----testing result for 12ch-480p-test ----
+FPS data: 39.71 39.62 40.07 40.63 40.63 40.03 40.27 39.86 39.83 39.91 40.31 39.78
+TOTAL= 12 SUM= 480.65 AvgFPS= 40.0542
+ 
+----testing result for 15ch-480p-test ----
+FPS data: 31.75 32.70 32.09 31.89 31.88 31.80 31.84 31.83 31.91 32.34 31.87 31.74 31.95 31.83 31.82
+TOTAL= 15 SUM= 479.24 AvgFPS= 31.9493
+ 
+----testing result for 20ch-480p-test ----
+FPS data: 24.06 23.81 23.61 23.54 23.62 23.59 23.57 23.64 23.68 23.59 23.82 23.56 23.61 23.55 23.68 23.59 23.61 23.89 23.59 23.85
+TOTAL= 20 SUM= 473.46 AvgFPS= 23.673
+ 
+----testing result for 24ch-480p-test ----
+FPS data: 17.16 17.23 17.24 17.18 17.35 17.20 17.28 17.32 17.37 17.13 17.12 17.17 17.32 17.15 17.14 17.55 17.28 17.15 17.32 17.19 17.14 17.13 17.23 17.20
+TOTAL= 24 SUM= 413.55 AvgFPS= 17.2312
+ 
+----testing result for 25ch-480p-test ----
+FPS data: 14.82 14.85 14.98 15.11 14.82 15.03 14.90 15.30 14.78 14.90 14.87 14.97 14.91 14.80 14.85 14.90 14.88 15.09 14.86 14.84 14.78 14.78 14.82 14.83 15.10
+TOTAL= 25 SUM= 372.77 AvgFPS= 14.9108
+ 
+----testing result for 30ch-480p-test ----
+FPS data: 9.97 9.99 9.75 9.97 9.98 9.98 9.97 10.01 9.98 9.98 10.14 10.03 9.99 9.96 10.00 10.01 9.98 9.98 9.98 9.99 9.97 9.99 10.10 9.99 10.01 10.02 9.97 9.97 9.97 9.97
+TOTAL= 30 SUM= 299.6 AvgFPS= 9.98667
+ 
+----testing result for 1ch-720-test ----
+FPS data: 233.99
+TOTAL= 1 SUM= 233.99 AvgFPS= 233.99
+ 
+----testing result for 2ch-720-test ----
+FPS data: 160.95 159.22
+TOTAL= 2 SUM= 320.17 AvgFPS= 160.085
+ 
+----testing result for 3ch-720-test ----
+FPS data: 124.27 125.66 118.10
+TOTAL= 3 SUM= 368.03 AvgFPS= 122.677
+ 
+----testing result for 4ch-720-test ----
+FPS data: 86.76 91.47 86.75 88.86
+TOTAL= 4 SUM= 353.84 AvgFPS= 88.46
+ 
+----testing result for 5ch-720-test ----
+FPS data: 70.90 70.16 69.29 70.30 71.61
+TOTAL= 5 SUM= 352.26 AvgFPS= 70.452
+ 
+----testing result for 6ch-720-test ----
+FPS data: 59.82 58.75 59.09 58.65 59.00 59.37
+TOTAL= 6 SUM= 354.68 AvgFPS= 59.1133
+ 
+----testing result for 7ch-720-test ----
+FPS data: 50.91 50.08 51.18 49.92 50.45 51.21 50.34
+TOTAL= 7 SUM= 354.09 AvgFPS= 50.5843
+ 
+----testing result for 8ch-720-test ----
+FPS data: 43.61 44.06 43.91 43.50 43.63 44.66 44.16 43.53
+TOTAL= 8 SUM= 351.06 AvgFPS= 43.8825
+ 
+----testing result for 9ch-720-test ----
+FPS data: 38.96 39.55 39.05 38.89 39.22 39.09 39.55 39.20 39.72
+TOTAL= 9 SUM= 353.23 AvgFPS= 39.2478
+ 
+----testing result for 10ch-720-test ----
+FPS data: 34.78 34.72 34.22 34.53 34.51 34.75 35.25 34.59 34.88 34.49
+TOTAL= 10 SUM= 346.72 AvgFPS= 34.672
+ 
+----testing result for 15ch-720-test ----
+FPS data: 16.27 16.15 16.07 16.11 16.07 16.08 16.13 16.17 16.05 16.36 16.11 16.06 16.04 16.06 16.08
+TOTAL= 15 SUM= 241.81 AvgFPS= 16.1207
+ 
+----testing result for 16ch-720-test ----
+FPS data: 11.11 11.23 11.18 11.12 11.09 11.14 11.13 11.08 11.25 11.12 11.14 11.12 11.12 11.15 11.18 10.81
+TOTAL= 16 SUM= 177.97 AvgFPS= 11.1231
+ 
+----testing result for 18ch-720-test ----
+FPS data: 9.48 9.40 9.39 9.36 9.39 9.45 9.40 9.43 9.38 9.38 9.39 9.48 9.36 9.40 9.41 9.44 9.38 9.38
+TOTAL= 18 SUM= 169.3 AvgFPS= 9.40556
+ 
+----testing result for 20ch-720-test ----
+FPS data: 7.36 7.34 7.41 7.29 6.90 7.28 7.48 7.29 7.30 7.30 7.28 7.29 7.29 7.43 7.29 7.36 7.29 7.30 7.29 7.28
+TOTAL= 20 SUM= 146.05 AvgFPS= 7.3025
+ 
+----testing result for 1ch-1080-test ----
+FPS data: 149.49
+TOTAL= 1 SUM= 149.49 AvgFPS= 149.49
+ 
+----testing result for 2ch-1080-test ----
+FPS data: 80.08 79.94
+TOTAL= 2 SUM= 160.02 AvgFPS= 80.01
+ 
+----testing result for 3ch-1080-test ----
+FPS data: 62.05 62.12 60.97
+TOTAL= 3 SUM= 185.14 AvgFPS= 61.7133
+ 
+----testing result for 4ch-1080-test ----
+FPS data: 47.89 47.93 48.07 48.08
+TOTAL= 4 SUM= 191.97 AvgFPS= 47.9925
+ 
+----testing result for 5ch-1080-test ----
+FPS data: 38.80 38.80 38.79 38.80 38.54
+TOTAL= 5 SUM= 193.73 AvgFPS= 38.746
+ 
+----testing result for 6ch-1080-test ----
+FPS data: 28.40 28.57 28.36 28.70 28.45 28.47
+TOTAL= 6 SUM= 170.95 AvgFPS= 28.4917
+ 
+----testing result for 7ch-1080-test ----
+FPS data: 14.42 14.43 14.22 14.42 14.42 14.10 14.55
+TOTAL= 7 SUM= 100.56 AvgFPS= 14.3657
+ 
+----testing result for 8ch-1080-test ----
+FPS data: 13.31 13.54 13.52 13.50 13.48 13.48 13.20 13.53
+TOTAL= 8 SUM= 107.56 AvgFPS= 13.445
+ 
+----testing result for 10ch-1080-test ----
+FPS data: 9.93 9.77 9.90 9.94 9.57 9.73 9.97 9.91 9.92 9.90
+TOTAL= 10 SUM= 98.54 AvgFPS= 9.854
+ 
+----testing result for 12ch-1080-test ----
+FPS data: 5.81 5.95 5.79 6.00 5.93 5.93 5.93 5.93 5.95 5.94 5.95 5.80
+TOTAL= 12 SUM= 70.91 AvgFPS= 5.90917

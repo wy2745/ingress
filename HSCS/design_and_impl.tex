@@ -1,0 +1,110 @@
+% \section{Design and Implementation}
+% \label{sec:design_and_impl}
+%
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{figure/architecture_2.eps}\\
+%   \caption{High level architecture of \name{}}
+%   \label{fig:architecture}
+% \end{figure}
+%
+% To address the Massive Update Issue for media transcoding workload,
+% this paper describes, \name{}, a hybrid page table shadowing scheme for \gvirt{}, as shown in Figure~{\ref{fig:architecture}}.
+% \name{} introduces a new page table shadowing mechanism for shadow page tables in \gvirt{}, namely relaxed page table shadowing,
+% which relaxes the constraints of write-protection to the guest page table.
+% \name{} switches between two different page table shadowing mechanisms, based on the pattern of GPU's current workload.
+% By combining traditional strict page table shadowing and relaxed page table shadowing mechanism, \name{} takes advantage of both.
+% For workloads with the Massive Update Issue like multi-thread media transcoding, \name{} could efficiently improve the \gvirt{}'s
+% performance.
+%
+% \subsection{Workflow of \name{}}
+% \label{subsec:workflow}
+%
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{figure/workflow.eps}\\
+%   \caption{Workflow of \name{}}
+%   \label{fig:workflow}
+% \end{figure}
+%
+% Figure~\ref{fig:workflow} illustrates the basic workflow of \name{}:
+% \begin{enumerate}[label=(\arabic*)]
+%   \item \name{} initiates the shadow page table which is consistent with the guest page table, and it makes all the page table write-protected.
+%   \item If a page table entry is modified by the guest, it triggers page fault which will be trapped into \name{}. \name{} takes a snapshot of this page and removes the write-protection of this page. The corresponding page table entry of the shadow page table will be switched into the relaxed shadowing mechanism. Afterwards, the modifications on the guest page will not be updated to the shadow page table immediately.
+%   \item When the guest VM is scheduled in, the shadow page table has been already inconsistent with the guest page table. \name{} will re-construct the shadow page table according to the
+%   previous snapshot to promote coherence with the guest page table again, so that it could guarantee the hardware engines use the correct translations.
+%   \item After the reconstruction of the shadow page table, \name{} sets the page table entries in the relaxed page table shadowing back to the strict page table shadowing. Then, this workflow circle would be repeated again.
+% \end{enumerate}
+%
+% \subsection{Relaxed Page Table Shadowing}
+% \label{subsec:asynchronous}
+% From \gpu{}'s programming model, we observe that the guest VM's modifications of page table entries will not take effect until the GPU commands are submitted to physical engine by VMM.
+% Inspired by this, we implement a new page table shadowing mechanism for page table called relaxed page table shadowing.
+% This mechanism is applied to the guest VM's shadow page table when \name{} detects that the guest VM modifies the page table entries massively,
+% i.e., the trap-and-emulation of the guest page table frequently happens.
+% In contrast to strict page table shadowing, the relaxed page table shadowing removes the write-protection of page tables to avoid the cost from trapping and
+% emulating the modifications of page table.
+%
+% For \name{}, the relaxed page table shadowing will reduce the overhead of trapping and emulating due to continuous and massive modifications on the guest page table.
+% After the shadow page table has been switched to the relaxed page table shadowing mechanism, modifications within the guest page table will not be updated to shadow page table
+% temporarily. The latency is acceptable because of the GPU programming model in which GPU may fetch the commands and cache the page table translations internally at the time
+% of command submission. At the time the commands are submitted to the physical engine, the shadow page table would be consistent with guest page table again to ensure
+% correct translations by reconstructing the page table.
+%
+% \subsection{Hybrid Page Table Shadowing}
+% \label{subsec:hybrid}
+% As we discussed before, for many workloads there are infrequent modifications to the guest page table, where the strict page table shadowing mechanism fits well in this situation.
+% In such cases, relaxed page table shadowing is not suitable, because reconstructing a page takes a longer period than trapping and emulating modifications on that page.
+% To make \name{} enjoy good performance for both cases and minimize the cost of updating shadow page table, we combine the two mechanisms into one hybrid page table shadowing,
+% where \name{}'s shadow page tables adaptively switch between the strict shadowing and the relaxed shadowing mechanisms, based on the current workload's access pattern.
+%
+% Since infrequent page table access pattern is ubiquitous, \name{} will keep guest page table mostly working with the strict shadowing mechanism. Once the \name{} detects the guest
+% VM is frequently modifying the page table, it will automatically switch the guest page table into a relaxed mechanism. When the guest VM no longer frequently modifies page table,
+% \name{} may switch guest page table back to the strict shadowing mechanism. \name{} can also selectively apply the relaxed shadowing mechanism to certain portions of the page table,
+% instead of the whole page table.
+%
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{figure/snapshot.eps}\\
+%   \caption{Page reconstruction with snapshot}
+%   \label{fig:page_rebuild}
+% \end{figure}
+%
+% \subsection{Page Reconstruction}
+% \label{subsec:page_rebuild}
+% Page reconstruction is necessary when the shadow pages are not consistent with the guest pages. There are 1024 page entries in one page, and in order to reconstruct the shadow page,
+% generally we need to re-write all the entries and make sure each entry is consistent with the corresponding entry of the guest page. However, when part of a page is modified,
+% we do not necessarily need to rewrite all its entries when we reconstruct it, because rewriting the unmodified part of the page is costly.
+% Hence, we introduce \emph{snapshot} to accelerate the page reconstruction.
+%
+% As shown in Figure~\ref{fig:page_rebuild}, when a shadow page is consistent with the guest page after the reconstruction or initiation, we take a snapshot of the guest page
+% and store it. When reconstructing a page, we will compare the current page with the snapshot and get the different entries. The different section is the modified part of the page.
+% Hence, we just need to reconstruct this part to make the shadow page consistent with the guest page table. Although the cost of reconstructing a page is expensive,
+% it is worthwhile compared to the efforts needed to trap and emulate the modification multiple times.
+%
+% \subsection{Reconstruction Policies}
+% \label{subsec:recon_policy}
+% We implement four reconstruction policies for \name{} and evaluate them to choose a final policy which delivers the best performance. When \name{} switches a page into the relaxed
+% shadowing mechanism, the write-protection of this page is removed. Moreover, \emph{relaxed page table shadowing} is an asynchronous mechanism which allows the shadow page table to
+% be inconsistent when it is not needed for delivering translations. Hence, the following modifications on it will not be updated to the shadow page immediately. Before the commands are submitted to the physical engine, \name{} will reconstruct the page's corresponding shadow page to ensure the correct translation. The profiling of cases with Massive Update Issue in section~{\ref{subsec:pte_update_pattern}} demonstrates that when the workload is accessing the page table massively, only certain pages are being accessed repeatedly,
+% and the majority of the guest page table still remains untouched. Hence, it is essential for \name{} to switch certain pages into relaxed shadowing mechanism and reconstruct
+% them when necessary.
+%
+% \textbf{The full reconstruction} policy is to switch all pages into the relaxed shadowing mechanism, and reconstruct them all before the commands are submitted to the physical engine.
+% When a VM is created, it allocates 512 pages in total, and we will remove the write-protection of all 512 pages. After that, there will no longer be any trapping and emulating to
+% update the shadow pages, and all the shadow pages will be reconstructed to guarantee that physical engine gets the correct translations.
+%
+% \textbf{The static partial reconstruction} policy selects a certain amount of pages to apply with relaxed shadowing. It reconstructs the selected pages each time to make them consistent
+% with their corresponding guest pages while the unselected pages still remain in the strict shadowing. According to the profiling of cases with the Massive Update Issue in section~{\ref{subsec:pte_update_pattern}}, there are some pages being accessed much more frequently than other pages, which are referred to as hot pages.
+% These hot pages are specifically selected to utilize the relaxed shadowing mechanism based on the observed access pattern.
+%
+% \textbf{The dynamic partial reconstruction} policy is utilized to apply the relaxed shadowing mechanism to pages dynamically, based on the access pattern of workload. At the time VM is created,
+% all the pages are applied with strict shadowing and \name{} maintains a list to record pages that are run with the relaxed shadowing. When a page is modified for the first time,
+% a page fault occurs. \name{} will add this page to the list and switch it into the relaxed shadowing mechanism. The new pages will then be continuously added to the list while
+% the workload is running. Eventually the pages in the list will cover all the modified pages.
+%
+% \textbf{The dynamic segmented partial reconstruction} policy is an optimization for the dynamic partial reconstruction policy. Like the dynamic partial reconstruction policy, \name{}
+% puts modified pages in the dirty list, and every time when the commands submitted to the physical engine, the shadow page table will be consistent with guest page table again,
+% by reconstruction. However, in this optimized policy, \name{} will reset the dirty list, and switch the pages in the list back to the strict shadowing mechanism after the reconstruction.
+%
+% Currently, \name{} uses the dynamic segmented partial reconstruction policy as default, according to the performance evaluation in section~\ref{subsec:reconstruction_policy}.
