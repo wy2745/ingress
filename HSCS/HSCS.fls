@@ -246,6 +246,12 @@ INPUT ./images/data1.png
 INPUT images/data2.png
 INPUT ./images/data2.png
 INPUT ./images/data2.png
+INPUT images/data3.png
+INPUT ./images/data3.png
+INPUT ./images/data3.png
+INPUT images/data4.png
+INPUT ./images/data4.png
+INPUT ./images/data4.png
 INPUT figure/static.eps
 INPUT ./figure/static.eps
 INPUT ./figure/static.eps
@@ -288,6 +294,7 @@ INPUT conclusion.tex
 INPUT conclusion.tex
 INPUT ack.tex
 INPUT ack.tex
+INPUT /usr/local/texlive/2016/texmf-dist/fonts/vf/adobe/times/ptmri7t.vf
 INPUT HSCS.bbl
 INPUT HSCS.bbl
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/public/cm/cmtt8.tfm
@@ -304,7 +311,6 @@ INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/adobe/times/ptmri7t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/adobe/times/ptmri7t.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/adobe/times/ptmrc7t.tfm
-INPUT /usr/local/texlive/2016/texmf-dist/fonts/vf/adobe/times/ptmri7t.vf
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/vf/adobe/times/ptmrc7t.vf
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/tfm/adobe/times/ptmr8r.tfm
 INPUT /usr/local/texlive/2016/texmf-dist/fonts/vf/adobe/times/ptmri7t.vf
