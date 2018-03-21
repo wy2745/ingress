@@ -1,13 +1,5 @@
 \begin{thebibliography}{10}
 
-\bibitem{website:3dmark}
-3dmark06.
-\newblock \url{http://www.futuremark.com}.
-
-\bibitem{website:heaven}
-Heaven3d.
-\newblock \url{http://unigine.com/products/heaven}.
-
 \bibitem{website:nvidiagrid}
 Nvidia grid: Graphics-accelerated virtualization.
 \newblock \url{http://www.nvidia.com/object/grid-technology.html}.
@@ -15,10 +7,6 @@ Nvidia grid: Graphics-accelerated virtualization.
 \bibitem{website:vbox}
 Oracle vm virtualbox.
 \newblock \url{https://www.virtualbox.org/}.
-
-\bibitem{website:passmark}
-Passmark2d.
-\newblock \url{http://www.passmark.com}.
 
 \bibitem{adams2006comparison}
 {\sc Adams, K., and Agesen, O.}

@@ -3,14 +3,12 @@
 This section presents a set of evaluations to show the performance of dynamic solution
 compared with the original ingress controller. We establish a kubernetes cluster to be the base of the whole evaluation. Then we emulate five workload patterns and run them for twice, one with the original ingress controller equiped,
 the other with our modified ingress controller equiped to compare their performance.
-In summary, our results show that ....
-with the original \gvirt{}. We run media transcoding and 2D/3D workloads in Linux, along with 2D/3D workloads in Windows.
-We first compare the four reconstruction policies in \name{}, which confirms that  dynamic segmented partial reconstruction policy is with the best performance.
-Then, we use this policy to compare \name{} with the original \gvirt{} as well as native performance.
-In summary, our results show that \name{} achieves 85\% of native performance in most media transcoding test cases on Linux. For Linux 3D workloads, \name{} has
-no negative effect in LightsMark, OpenArena, and UrbanTerror, respectively. For Linux 2D workloads, \name{} shows no negative effect in firefox-asteroids, firefox-scrolling,
-midori-zoomed, and gnome-system-monitor, respectively. For windows 2D/3D workloads, \name{} has no negative effect on performance in 3Dmark06~{\cite{website:3dmark}},
-Heaven3D~{\cite{website:heaven}}, and PassMark2D~{\cite{website:passmark}} respectively.
+In summary, our results show that the modified ingress controller achieves better performance in most web cases. For
+independent web applications, the modified ingress controller can balance load well even when there is a great difference between resource consumption of requests. Furthermore, in scaling case,
+modified ingress controller succeeds to split more load to the new idle endpoints, helping reduce pressure of high-load endpoints and improving RPS. For dependent web applications, modified
+ingress controller helps protecting endpoints from being influenced by node load, resource race against other endpoints and dependencies to other applications. Modified ingress controller
+addresses these cases with extra 1/3 overhead. The original ingress controller consumes about 32~35 millicore to synchronize endpoints changes while modified ingress controller consumes 10 more
+millicore for load monitor and dynamic load balancing.
 
 \subsection{Configuration}
 
@@ -19,7 +17,7 @@ All these are deployed as pods on kubernetes. Our kubernetes cluster is made up 
 a 1TB HDD disk. Nodes share the same configuration: Intel Xeon processor E5 2620 with 8 cores (2.10Ghz), 64GB system memory and a 1TB HDD disk. Many system components are deployed on the master, because it is responsible for managing the whole cluster, making it in high-load state, so we do not put any workload on master.
 The tsung server is a request generator to emulate workload pattern for comparing performance, and we deploy it alone on node1 without putting any other application on node1 to make sure its perfomance on generating requests is not influenced by other unrelated factors during the evaluation.
 Similarly, to gurantee the pure performance, we let ingress controller deployed alone on node2. The test application is a java web application connected to a database, it has several apis exposed, requests of different api have diverse consumption on CPU,memory,network and database.
-The database is a MySQL instance accessed by the test applications. We deploy test applications and databases on node3, node4 and node5. With different strategies to generate workload, different number and placement of test application and database, we emulate fix workload pattern to
+The database is a MySQL instance accessed by the test applications. We deploy test applications on node3, node4, node5 and database on node6. With different strategies to generate workload, different number and placement of test application and database, we emulate fix workload pattern to
 compare performance.
 
 \subsection{Workload Pattern}
@@ -45,7 +43,8 @@ Initialization pattern stands for the initial state when test applications are j
 to prevent that they are impacted by each other. After the deployment, we generate requests of all kinds at a fixed speed by tsung server to access test applications through ingress controller.
 For convenience, we use the cpu statistics to present performance. Figure~\ref{fig:original_initialization} presents the performance of original ingress controller under initialization pattern and
 figure~{\ref{fig:modified_initialization}} shows the performance of modified ingress controller. Result shows that for the original controller, load of endpoints become unstable and endpoint3 once becomes overhead(its cpu usage excceed its cpu limit) during 80s-100s, causing several
-requests return 503 to tsung server, it confirms that the default round-robin algorithm only performs well when resource consumption of requests are almost the same, which is unpracticial. Figure~{\ref{fig:modified_initialization}} shows that
+requests return 503 to tsung server, it confirms that the default round-robin algorithm only performs well when resource consumption of requests are almost the same, which does not match the real circumstance initialization pattern describes: different kinds of requests have diverse
+resource requirements, under this circumstance, if we dispatch requests evenly to endpoints, some endpoints can become overhead presumably. Therefore, 503-request appears in evaluation for original ingress controller. Figure~{\ref{fig:modified_initialization}} shows that
 with the effort of modified ingress controller, there is no more overhead endpoint, load of endpoints are more even instead. More and more, table~{\ref{table:request_summary1}} points out that original ingress controller finishes 8892 reqeust, with 1108 503-requests, the
 modified ingress controller finishes 10000 requests with no 503-request, and the total number of requests is 10000.
 \hspace{0pt}
@@ -101,8 +100,11 @@ Node-blocking pattern is established to evaluate performance of ingress controll
 Then we generate workload for node3 to keep it on high-load state, leaving only enough resource for endpoint1. After that, we generate high workload to keep these two endpoints in
 high-load state but not overload and by comparing the RPS, we obtain performing disparity between original ingress controller and modified ingress controller. Through the comparison between
 figure~{\ref{}} and figure~{\ref{}}, we find that it costs the original one about xxx second to handler xxx requests while it costs the modified one only YYY seconds, which demonstrates the fact
-that load of host can affect the performance of endpoints. That is because the default isolation mechanism of 
-
+that load of host can affect the performance of endpoints. That is because the default isolation mechanism of docker, which is the container engine of kubernetes, can not support node-blocking pattern well.
+Kubernetes provides ${resource.request}$ and ${resource.limit}$ for users to allocate resource for their applications, however it does not gurantee the monopolization of resource. For example, the request
+limit and request of cpu are implemented by a combination of ${cgroup}$ commands: ${cfs\_quota\_us}$,${cfs\_period\_us}$ and ${cpushare}$. These commands insulates cpu through restricting the length of cpu time slice
+without binding applications to specific cpus, so when preemption happens, the inevitable context switch brings extra overhead. The modified ingress controller reduce context switch by taking load of host into consideration
+when balancing load so it gets a higher RPS.
 
 
 \begin{figure}[!htb]
@@ -112,51 +114,15 @@ that load of host can affect the performance of endpoints. That is because the d
  \label{fig:static}
 \end{figure}
 
-We selectively switch 50, 100, 200, and 300 pages into the relaxed mechanism to evaluate the static partial reconstruction policy.
-As shown in Figure~\ref{fig:static}, for cases without the issue static partial reconstruction policy achieves a worse performance than \gvirt{}.
-The more pages that are switched into the relaxed mechanism, the worse the performance static partial reconstruction becomes.
-For pages with few page table updates, reconstruction is meaningless. For cases with the Massive Update Issue, the static partial reconstruction
-policy works and achieves a superior performance than \gvirt{}. Policy with 200 pages setting achieves the best performance for cases with the
-Massive Update Issue, because policies with less pages cannot cover all the frequently accessed pages,
-and policies with more pages include some useless pages.
+Interrelationship pattern describes situation when several endpoints are deployed in the same node, we set up this pattern to figure out the ability of ingress controller to eliminate interrelationship
+between these endpoints. To emulate this pattern, we put endpoint1, endpoint2, endpoint3 in node3, endpoint4  in node4 and endpoint5 in node5. Then we generate high workload to keep these endpoints in high-load
+state. Figure~{\ref{}} shows that in original case, loads of endpoint1, endpoint2 and endpoint3 are higher than other endpoints at the same time, and finally it provides xxx RPS. That is because endpoints of the same
+application share the same resource feature, so if endpoints are deployed into the same node, their race for resource becomes fierce, thus they impact on performance of each other. Figure~{\ref{}} demonstrates that
+the modified ingress controller succeeds to reduce race and provide xxx RPS.
 
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[width=0.45\textwidth]{figure/partial.eps}\\
- \caption{\name{} with dynamic partial reconstruction and dynamic segmented partial reconstruction}
- \label{fig:partial}
-\end{figure}
-
-Figure~\ref{fig:partial} confirms that the dynamic segmented partial reconstruction achieves better performance than dynamic partial reconstruction
-comprehensively. \name{} performs better than \gvirt{} in issued cases, and has similar performance in normal cases.
-The dynamic partial reconstruction switches the PTE pages into the relaxed mechanism progressively. However, some pages switched into the relaxed mechanism
-may never be accessed again, and reconstructing these pages will produce extra overhead. Dynamic segmented partial reconstruction resets the relaxed pages,
-after setting them to the guest pages. So for each cycle, dynamic segmented policy only reconstructs pages that need to be reconstructed.
-Overall, dynamic segmented partial reconstruction is the most efficient policy, which is finally adopted by \name{}.
-
-\subsection{2D and 3D performance}
-In this section, we evaluate the 2D and 3D performance of \name{} under Linux and Windows. The results show
-that \name{} has comparable performance with \gvirt{}'s 2D and 3D performance.
-Moreover, \name{} achieves slightly superior performance than \gvirt{} in some cases.
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[width=0.45\textwidth]{figure/linux.eps}\\
- \caption{Performance running Linux 2D/3D workloads}
- \label{fig:linux}
-\end{figure}
-
-\begin{figure}[htbp]
- \centering
- \includegraphics[width=0.45\textwidth]{figure/windows.eps}\\
- \caption{Performance running Windows 2D/3D workloads}
- \label{fig:windows}
-\end{figure}
-\hspace{0pt}
-
-Figure~{\ref{fig:linux}} demonstrates that \name{} achieves up to 94.63\% of native performance in 2D workloads and 88.81\% in 3D workloads on Linux.
-Figure~{\ref{fig:windows}} demonstrates that \name{} achieves up to 88.81\% on Windows.
-
-With the exception of the firefox-scrolling, urbanterror, warsow, SM2.0 and Pass2D, \name{} outperforms \gvirt{}. However,
-the performance discrepancy between \name{} and \gvirt{} are acceptable.
+Database-blocking pattern aims to figure out whether ingress controller can perform well under the micro service background. Under this circumstance, web applications tend to rely on each other rather than
+finish jobs independently, so QOS is not only decided by application itself, but also other applications it relies on. For convenience, we choose database-accessing applications as study case and set up database-blocking
+pattern: First we deploy endpoint1 in node3, endpoint2 in node4, endpoint3 in node5, database1 and database2 in node6, then we configure endpoint1, endpoint2 to connect to database1 and endpoint3 to database2.
+Finally, we generate workload to keep these endpoints in high-load state but not overhead. By comparing RPS, we get their performing disparity. Figure~{\ref{}} shows that original ingress controller failes to divide load of database1 to datebase2
+which comes from endpoint1 and endpoint2. As a result, database1 bears more load than database2 all the time, pulling down the entire RPS. As figure~{\ref{}} shown, modified ingress controller succeeds to balance load across database1 and database2,
+providing xxx RPS.
