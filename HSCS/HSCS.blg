@@ -6,45 +6,45 @@ Database file #1: HSCS.bib
 Warning--to sort, need author or key in website:vbox
 Warning--to sort, need author or key in website:nvidiagrid
 Warning--can't use both volume and number fields in humphreys2002chromium
-You've used 21 entries,
+You've used 31 entries,
             2253 wiz_defined-function locations,
-            646 strings with 8423 characters,
-and the built_in function-call counts, 8994 in all, are:
-= -- 845
-> -- 515
+            709 strings with 10189 characters,
+and the built_in function-call counts, 12154 in all, are:
+= -- 1138
+> -- 650
 < -- 0
-+ -- 215
-- -- 190
-* -- 724
-:= -- 1401
-add.period$ -- 62
-call.type$ -- 21
-change.case$ -- 157
++ -- 276
+- -- 236
+* -- 957
+:= -- 1901
+add.period$ -- 92
+call.type$ -- 31
+change.case$ -- 209
 chr.to.int$ -- 0
-cite$ -- 24
-duplicate$ -- 332
-empty$ -- 667
-format.name$ -- 190
-if$ -- 1894
+cite$ -- 34
+duplicate$ -- 465
+empty$ -- 941
+format.name$ -- 236
+if$ -- 2576
 int.to.chr$ -- 0
-int.to.str$ -- 21
-missing$ -- 19
-newline$ -- 106
-num.names$ -- 38
-pop$ -- 187
+int.to.str$ -- 31
+missing$ -- 30
+newline$ -- 156
+num.names$ -- 58
+pop$ -- 249
 preamble$ -- 1
-purify$ -- 136
+purify$ -- 179
 quote$ -- 0
-skip$ -- 242
+skip$ -- 326
 stack$ -- 0
-substring$ -- 492
-swap$ -- 113
+substring$ -- 658
+swap$ -- 151
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 84
+type$ -- 122
 warning$ -- 3
-while$ -- 77
-width$ -- 23
-write$ -- 215
+while$ -- 104
+width$ -- 33
+write$ -- 311
 (There were 3 warnings)

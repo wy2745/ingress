@@ -1,16 +1,29 @@
 \section{Related Work}
 \label{sec:related_work}
 
-\subsection{\gpu{} Benchmarks}
+\subsection{Load balancing classification}
 
 \hspace{0pt}
-Since \gpu{}s are used for acceleration of general purpose computing, some benchmarks have been implemented for evaluating their performance. Rodinia~{\cite{che2009rodinia}} is a benchmark suite for heterogeneous computing. It aids architects in the study of emerging platforms such as \gpu{}s. Rodinia includes applications and kernels that target multi-core CPU and GPU platforms. And Parboil~{\cite{stratton2012parboil}} is a set of throughput computing applications useful for studying the performance of throughput computing architecture and compilers.† It collects benchmarks from throughput computing application researchers in many different scientific and commercial fields including image processing, bio-molecular simulation, fluid dynamics, and astronomy.
+According to R Kaur~{\cite{Kaur2014Load}}, load balancing algorithms can be mainly divided into two types: static load balancing algorithm and dynamic load balancing algorithm. Furthermore, dynamic algorithms have two types,
+they are distributed and non-distributed approach. The biggest difference between static and dynamic algorithms is whether they depend on server load or request property. A request can either access a file or require processing data. Some researches have been done to reduce latency to access static files:
+S Ayyasamy~{\cite{Ayyasamy2010A}} concentrates on static resource placement in P2P content distribution. According to acccess frequency, static resources are divided into hot and cold resources. Data transmission performance is enhanced by placing hot resources to server with
+stronger processing ability and lower access latency. G Park adopts choice algorithm to optimize file replication and data partition policies. Q Huang~{\cite{Huang2014Characterizing}} uses hashing and cache to migrate load imbalance. other researches focus on data-processing requests: Sharma~{\cite{Sharma2011Framework}} performs dynamic load balancing
+under the assumption that the resource consumption of request have already been known as job metric, he measures servers by several metrics like ability metric and load metric. With the combination of job metric and server metrics,
+he evens load across servers. Chandak~{\cite{Chandak2012Dynamic}} divides servers into three levels: lightly loaded, moderately loaded and heavily loaded accoring to their cpu usage. In his research, moderately loaded is regarded as the stable and final
+level, he performs load balancing by dispatching more workload to lightly loaded server and less workload to heavily loaded servers. L Zhang~{\cite{Zhang2010A}} describes processing time of a request with cpu processing time, memory usage and disk access time. For each server,
+he maintains a mission list to record requests the server is processing. When a new request arrives, if the processing ability of servers is higher than the requirement sum of the new request and requests in mission list, they are regarded suitable to process the request.
+Z Xu~{\cite{Xu2014A}} and ME Gebrehiwot~{\cite{Gebrehiwot2017Energy}} adjust weight of servers in Round-robin and least connection algorithm according to their ability. G Velusamy~{\cite{Velusamy2017Smart}} defines server affinity to adjust load balancing algorithm. The server affinity presents whether a server can handler a specific request type faster than
+other server. Loadbalancer collects and analyzes logs from servers all the time to get real-time server affinity, with which it dispatches requests to suitable servers. V Cardellini~{\cite{Cardellini2015Dynamic}} proposes the adaptive TTL algorithm, which adds geographic information and server load to the Round-robin algorithm. The adaptive TTL algorithm
+tends to dispatch requests to low-loaded servers that are geographically close to requests senders.Unlike the non-distributed approaches mentioned above, Eludiora~{\cite{Eludiora2010A}} and Menon~{\cite{Menon2013A}} adopt distributed solutions. Eludiora's research regulates jobs/tasks migration to minimize extra bandwidth consumption, and therefore improve RPS.
+Menon establishes a broadcast protocol for server, for each low-loaded server, it broadcast its ip to two random servers, if these servers are overload, they transfer new requests to the low-loaded servers.
 
-Unfortunately, the benchmarks above are not available for Intel's GPU now. Meanwhile, GPU's media performance has become a big concern for service providers. However, there is no benchmark specifically for this kind of workload. So, this paper proposes GMedia, a media transcoding benchmark based on Intel's MSDK.
+Unfortunately, there is no effective solution for load balancing of container-based cluster. For container-based cluster like Kubernetes, containers generally own the same geographical position and the same process ability. The key factors that cause load imbalance are the resource consumption of request and dependency between services. So this paper proposes
+a load monitor to learn resource consumption and a more thorough load metric for server, which adopt service dependency.
+\subsection{Load balancing metrics}
 
-\subsection{\gpu{} Virtualization}
-
-Though virtualization has been studied extensively in recent years, \gpu{} virtualization is still a nascent area of research. Typically, there are four ways to use \gpu{} in a \vm{}: I/O pass-through, device emulation, API remoting, and mediated pass-through.
+Metrics are needed to evaluate performance of a load balancing algorithm. R Kaur~{\cite{Kaur2014Load}} summarys that throughput is calculated to the ability of algorithm to process as many requests as possible during a fixed period. The performance of algorithm is high if its throughput is high. Response time is the time that are taken to process a request.
+With a lower response time, a algorithm acheives better performance. This paper uses RPS to cover throughput and response time, a higher RPS means that requests are led to more suitable servers, thus bringing lowwer response time and higher throughput. For distributed algorithm, migration time costed by migrating request from one server to another is calculated
+to evaluate performance. Apart from RPS, this paper proposes faults. If a algorithm failes to balance load, overload servers may failes to process requests, cauing 503 Service Unavailable.  Though virtualization has been studied extensively in recent years, \gpu{} virtualization is still a nascent area of research. Typically, there are four ways to use \gpu{} in a \vm{}: I/O pass-through, device emulation, API remoting, and mediated pass-through.
 
 A naive way to use \gpu{} in virtualized environment would be to directly pass through the device to a specific \vm{}~{\cite{hiremane2007intel, dong2009towards}}. However, the \gpu{} resources are dedicated and cannot be multiplexed.
 

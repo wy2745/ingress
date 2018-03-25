@@ -19,12 +19,22 @@ Oracle vm virtualbox.
 \newblock The evolution of an x86 virtual machine monitor.
 \newblock {\em ACM SIGOPS Operating Systems Review 44}, 4 (2010), 3--18.
 
-\bibitem{che2009rodinia}
-{\sc Che, S., Boyer, M., Meng, J., Tarjan, D., Sheaffer, J.~W., Lee, S.-H., and
-  Skadron, K.}
-\newblock Rodinia: A benchmark suite for heterogeneous computing.
-\newblock In {\em Workload Characterization, 2009. IISWC 2009. IEEE
-  International Symposium on\/} (2009), IEEE, pp.~44--54.
+\bibitem{Ayyasamy2010A}
+{\sc Ayyasamy, S., and Sivanandam, S.~N.}
+\newblock A cluster based replication architecture for load balancing in
+  peer-to-peer content distribution.
+\newblock {\em International Journal of Computer Networks & Communications 2},
+  5 (2010).
+
+\bibitem{Cardellini2015Dynamic}
+{\sc Cardellini, V., Colajanni, M., and Yu, P.~S.}
+\newblock Dynamic load balancing on web-server systems.
+\newblock {\em Internet Computing IEEE 3}, 3 (2015), 28--39.
+
+\bibitem{Chandak2012Dynamic}
+{\sc Chandak, A., Jaju, K., Kanfade, A., Lohiya, P., and Joshi, A.}
+\newblock Dynamic load balancing of virtual machines using qemu-kvm.
+\newblock {\em International Journal of Computer Applications\/} (2012).
 
 \bibitem{deelman2005pegasus}
 {\sc Deelman, E., Singh, G., Su, M.-H., Blythe, J., Gil, Y., Kesselman, C.,
@@ -52,6 +62,18 @@ Oracle vm virtualbox.
 \newblock In {\em High Performance Computing and Simulation (HPCS), 2010
   International Conference on\/} (2010), IEEE, pp.~224--231.
 
+\bibitem{Eludiora2010A}
+{\sc Eludiora, S., Abiona, O., Aderounmu, G., Oluwatope, A., Onime, C., and
+  Kehinde, L.}
+\newblock A load balancing policy for distributed web service.
+\newblock {\em International Journal of Communications Network & System
+  Sciences 3}, 8 (2010), 645--654.
+
+\bibitem{Gebrehiwot2017Energy}
+{\sc Gebrehiwot, M.~E., Aalto, S., and Lassila, P.}
+\newblock Energy efficient load balancing in web server clusters.
+\newblock In {\em International Teletraffic Congress\/} (2017), pp.~13--18.
+
 \bibitem{giunta2010gpgpu}
 {\sc Giunta, G., Montella, R., Agrillo, G., and Coviello, G.}
 \newblock A gpgpu transparent virtualization component for high performance
@@ -78,6 +100,12 @@ Oracle vm virtualbox.
 \newblock Intel virtualization technology for directed i/o (intel vt-d).
 \newblock {\em Technology@ Intel Magazine 4}, 10 (2007).
 
+\bibitem{Huang2014Characterizing}
+{\sc Huang, Q., Gudmundsdottir, H., Vigfusson, Y., Freedman, D.~A., Birman, K.,
+  and Renesse, R.~V.}
+\newblock Characterizing load imbalance in real-world networked caches.
+\newblock In {\em ACM Workshop on Hot Topics in Networks\/} (2014), p.~8.
+
 \bibitem{humphreys2002chromium}
 {\sc Humphreys, G., Houston, M., Ng, R., Frank, R., Ahern, S., Kirchner, P.~D.,
   and Klosowski, J.~T.}
@@ -85,6 +113,12 @@ Oracle vm virtualbox.
   clusters.
 \newblock In {\em ACM Transactions on Graphics (TOG)\/} (2002), vol.~21, ACM,
   pp.~693--702.
+
+\bibitem{Kaur2014Load}
+{\sc Kaur, R., and Luthra, P.}
+\newblock Load balancing in cloud computing.
+\newblock {\em Int.conf.on Recent Trends in Information Telecommunication &
+  Computing Itc\/} (2014).
 
 \bibitem{kivity2007kvm}
 {\sc Kivity, A., Kamay, Y., Laor, D., Lublin, U., and Liguori, A.}
@@ -98,6 +132,11 @@ Oracle vm virtualbox.
 \newblock In {\em Proceedings of the 3rd international conference on Virtual
   execution environments\/} (2007), ACM, pp.~33--43.
 
+\bibitem{Menon2013A}
+{\sc Menon, H., and Kalé, L.}
+\newblock {\em A distributed dynamic load balancer for iterative applications}.
+\newblock IEEE, 2013.
+
 \bibitem{qi2014vgris}
 {\sc Qi, Z., Yao, J., Zhang, C., Yu, M., Yang, Z., and Guan, H.}
 \newblock Vgris: Virtualized gpu resource isolation and scheduling in cloud
@@ -105,18 +144,18 @@ Oracle vm virtualbox.
 \newblock {\em ACM Transactions on Architecture and Code Optimization (TACO)
   11}, 2 (2014), 17.
 
+\bibitem{Sharma2011Framework}
+{\sc Sharma, D., and Saxena, A.~B.}
+\newblock Framework to solve load balancing problem in heterogeneous web
+  servers.
+\newblock {\em International Journal of Computer Science & Engineering Survey
+  2}, 1 (2011).
+
 \bibitem{shi2012vcuda}
 {\sc Shi, L., Chen, H., Sun, J., and Li, K.}
 \newblock vcuda: Gpu-accelerated high-performance computing in virtual
   machines.
 \newblock {\em Computers, IEEE Transactions on 61}, 6 (2012), 804--816.
-
-\bibitem{stratton2012parboil}
-{\sc Stratton, J.~A., Rodrigues, C., Sung, I.-J., Obeid, N., Chang, L.-W.,
-  Anssari, N., Liu, G.~D., and Hwu, W.-M.}
-\newblock Parboil: A revised benchmark suite for scientific and commercial
-  throughput computing.
-\newblock {\em Center for Reliable and High-Performance Computing\/} (2012).
 
 \bibitem{suzuki2014gpuvm}
 {\sc Suzuki, Y., Kato, S., Yamada, H., and Kono, K.}
@@ -128,5 +167,22 @@ Oracle vm virtualbox.
 {\sc Tian, K., Dong, Y., and Cowperthwaite, D.}
 \newblock A full gpu virtualization solution with mediated pass-through.
 \newblock In {\em Proc. USENIX ATC\/} (2014).
+
+\bibitem{Velusamy2017Smart}
+{\sc Velusamy, G., and Lent, R.}
+\newblock Smart load-balancer for web applications.
+\newblock In {\em International Conference\/} (2017), pp.~19--26.
+
+\bibitem{Xu2014A}
+{\sc Xu, Z., and Wang, X.}
+\newblock A modified round-robin load-balancing algorithm for cluster-based web
+  servers.
+\newblock In {\em Control Conference\/} (2014), pp.~3580--3584.
+
+\bibitem{Zhang2010A}
+{\sc Zhang, L., Li, X.~P., and Yuan, S.}
+\newblock A content-based dynamic load-balancing algorithm for heterogeneous
+  web server cluster.
+\newblock {\em Computer Science & Information Systems 7}, 1 (2010), 153--162.
 
 \end{thebibliography}
