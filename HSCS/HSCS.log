@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.2.14)  25 MAR 2018 16:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.2.14)  8 APR 2018 19:32
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -382,46 +382,43 @@ Underfull \hbox (badness 1253) in paragraph at lines 2--1
   \OT1/ptm/m/n/10 Re-cently web ap-pli-ca-tions have grown ex-plo-sively
  []
 
+
+Underfull \hbox (badness 1184) in paragraph at lines 8--9
+[]\OT1/ptm/m/n/10 The load col-lec-tion part tries to col-lect in-for-ma-
+ []
+
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 15.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 16.
 [1{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
-]
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 27.
-
-
-LaTeX Warning: Reference `sec:benchmark' on page 2 undefined on input line 27.
-
-
-LaTeX Warning: Reference `sec:design_and_impl' on page 2 undefined on input line 29.
-
-) (./background.tex <images/ingress_controller.png, id=10, 394.47375pt x 181.67876pt>
+]) (./background.tex <images/ingress_controller.png, id=10, 512.91624pt x 412.54124pt>
 File: images/ingress_controller.png Graphic file (type png)
  <use images/ingress_controller.png>
-Package pdftex.def Info: images/ingress_controller.png used on input line 11.
-(pdftex.def)             Requested size: 211.3883pt x 97.35657pt.
-) (./benchmark.tex <images/dynamic_solution.png, id=12, 384.43625pt x 181.67876pt>
+Package pdftex.def Info: images/ingress_controller.png used on input line 19.
+(pdftex.def)             Requested size: 211.3883pt x 170.01799pt.
+ [2 <./images/ingress_controller.png>]) (./benchmark.tex <images/dynamic_solution.png, id=16, 512.91624pt x 442.65375pt>
 File: images/dynamic_solution.png Graphic file (type png)
  <use images/dynamic_solution.png>
 Package pdftex.def Info: images/dynamic_solution.png used on input line 10.
-(pdftex.def)             Requested size: 211.3883pt x 99.90143pt.
- [2 <./images/ingress_controller.png>] <images/request_learning.png, id=17, 266.9975pt x 201.75375pt>
+(pdftex.def)             Requested size: 211.3883pt x 182.42805pt.
+ <images/request_learning.png, id=17, 333.245pt x 292.09125pt>
 File: images/request_learning.png Graphic file (type png)
  <use images/request_learning.png>
 Package pdftex.def Info: images/request_learning.png used on input line 25.
-(pdftex.def)             Requested size: 211.3883pt x 159.73773pt.
+(pdftex.def)             Requested size: 211.3883pt x 185.28421pt.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 32.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 32.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 32.
- <images/endpoint_load.png, id=18, 272.01625pt x 201.75375pt>
+ [3 <./images/dynamic_solution.png> <./images/request_learning.png>] <images/endpoint_load.png, id=23, 403.5075pt x 296.10625pt>
 File: images/endpoint_load.png Graphic file (type png)
  <use images/endpoint_load.png>
 Package pdftex.def Info: images/endpoint_load.png used on input line 42.
-(pdftex.def)             Requested size: 211.3883pt x 156.79468pt.
- [3 <./images/dynamic_solution.png> <./images/request_learning.png> <./images/endpoint_load.png>]
+(pdftex.def)             Requested size: 211.3883pt x 155.12375pt.
+
 Underfull \hbox (badness 5217) in paragraph at lines 85--87
 \OT1/ptm/m/n/10 where $\OML/ztmcm/m/it/10 L[]f[]$ \OT1/ptm/m/n/10 is con-sump-tion of a given fac-
  []
@@ -441,7 +438,7 @@ Underfull \hbox (badness 7649) in paragraph at lines 85--87
 \OT1/ptm/m/n/10 among all re-quest types.$\OML/ztmcm/m/it/10 R[]f[]$ \OT1/ptm/m/n/10 is re-quire-ment
  []
 
-
+[4 <./images/endpoint_load.png>]
 Overfull \hbox (7.1261pt too wide) in paragraph at lines 110--122
  [] 
  []
@@ -455,76 +452,84 @@ you forgot something else, as in `\hbox{$x}'. In such cases
 the way to recover is to insert both the forgotten and the
 deleted material, e.g., by typing `I$}'.
 
-[4]) (./design_and_impl.tex) (./eval.tex [5] <images/data1.png, id=36, 475.5366pt x 308.352pt>
+[5]) (./design_and_impl.tex) (./eval.tex [6] <images/data1.png, id=39, 475.5366pt x 308.352pt>
 File: images/data1.png Graphic file (type png)
  <use images/data1.png>
-Package pdftex.def Info: images/data1.png used on input line 30.
+Package pdftex.def Info: images/data1.png used on input line 24.
 (pdftex.def)             Requested size: 211.3883pt x 137.068pt.
 
-Underfull \hbox (badness 1107) in paragraph at lines 25--34
+Underfull \hbox (badness 1107) in paragraph at lines 19--28
 \OT1/ptm/m/n/10 In this sec-tion, we eval-u-ate four work-load pat-terns
  []
 
 
 Underfull \vbox (badness 1221) has occurred while \output is active []
 
- [6] <images/data2.png, id=40, 475.5366pt x 308.352pt>
+ <images/data2.png, id=40, 475.5366pt x 308.352pt>
 File: images/data2.png Graphic file (type png)
  <use images/data2.png>
-Package pdftex.def Info: images/data2.png used on input line 37.
+Package pdftex.def Info: images/data2.png used on input line 31.
 (pdftex.def)             Requested size: 211.3883pt x 137.068pt.
- <images/data3.png, id=41, 475.5366pt x 308.352pt>
+ [7 <./images/data1.png> <./images/data2.png>] <images/data3.png, id=47, 475.5366pt x 308.352pt>
 File: images/data3.png Graphic file (type png)
  <use images/data3.png>
-Package pdftex.def Info: images/data3.png used on input line 67.
+Package pdftex.def Info: images/data3.png used on input line 54.
 (pdftex.def)             Requested size: 211.3883pt x 137.068pt.
- <images/data4.png, id=42, 475.5366pt x 308.352pt>
+ <images/data4.png, id=48, 475.5366pt x 308.352pt>
 File: images/data4.png Graphic file (type png)
  <use images/data4.png>
-Package pdftex.def Info: images/data4.png used on input line 74.
+Package pdftex.def Info: images/data4.png used on input line 61.
 (pdftex.def)             Requested size: 211.3883pt x 137.068pt.
- [7 <./images/data1.png> <./images/data2.png> <./images/data3.png> <./images/data4.png>]
-
-LaTeX Warning: Reference `' on page 8 undefined on input line 102.
-
-
-LaTeX Warning: Reference `' on page 8 undefined on input line 102.
-
-Package epstopdf Info: Source file: <figure/static.eps>
-(epstopdf)                    date: 2016-03-03 13:56:56
-(epstopdf)                    size: 35619 bytes
-(epstopdf)             Output file: <figure/static-eps-converted-to.pdf>
-(epstopdf)                    date: 2017-12-12 15:17:58
-(epstopdf)                    size: 8985 bytes
-(epstopdf)             Command: <repstopdf --outfile=figure/static-eps-converted-to.pdf figure/static.eps>
-(epstopdf)             \includegraphics on input line 112.
-Package epstopdf Info: Output file is already uptodate.
-<figure/static-eps-converted-to.pdf, id=51, 361.35pt x 252.945pt>
-File: figure/static-eps-converted-to.pdf Graphic file (type pdf)
- <use figure/static-eps-converted-to.pdf>
-Package pdftex.def Info: figure/static-eps-converted-to.pdf used on input line 112.
-(pdftex.def)             Requested size: 211.3883pt x 147.97029pt.
+ [8 <./images/data3.png> <./images/data4.png>] <images/data5.png, id=54, 475.5366pt x 308.352pt>
+File: images/data5.png Graphic file (type png)
+ <use images/data5.png>
+Package pdftex.def Info: images/data5.png used on input line 85.
+(pdftex.def)             Requested size: 211.3883pt x 137.068pt.
+ <images/data6.png, id=55, 475.5366pt x 308.352pt>
+File: images/data6.png Graphic file (type png)
+ <use images/data6.png>
+Package pdftex.def Info: images/data6.png used on input line 92.
+(pdftex.def)             Requested size: 211.3883pt x 137.068pt.
 
 
-LaTeX Warning: Reference `' on page 8 undefined on input line 119.
+LaTeX Warning: Reference `' on page 9 undefined on input line 97.
+
+<images/data7.png, id=56, 475.5366pt x 308.352pt>
+File: images/data7.png Graphic file (type png)
+ <use images/data7.png>
+Package pdftex.def Info: images/data7.png used on input line 101.
+(pdftex.def)             Requested size: 211.3883pt x 137.068pt.
+ <images/data8.png, id=57, 475.5366pt x 308.352pt>
+File: images/data8.png Graphic file (type png)
+ <use images/data8.png>
+Package pdftex.def Info: images/data8.png used on input line 108.
+(pdftex.def)             Requested size: 211.3883pt x 137.068pt.
+ <images/data9.png, id=58, 475.5366pt x 308.352pt>
+File: images/data9.png Graphic file (type png)
+ <use images/data9.png>
+Package pdftex.def Info: images/data9.png used on input line 117.
+(pdftex.def)             Requested size: 211.3883pt x 137.068pt.
+ [9 <./images/data5.png> <./images/data6.png> <./images/data7.png> <./images/data8.png>] <images/data10.png, id=66, 475.5366pt x 308.352pt>
+File: images/data10.png Graphic file (type png)
+ <use images/data10.png>
+Package pdftex.def Info: images/data10.png used on input line 124.
+(pdftex.def)             Requested size: 211.3883pt x 137.068pt.
+) (./related.tex) (./conclusion.tex
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [10 <./images/data9.png> <./images/data10.png>]) (./ack.tex)
+Underfull \hbox (badness 1728) in paragraph at lines 3--52
+\OT1/ptm/m/n/10 ful com-ments. This work was sup-ported by Na-
+ []
 
 
-LaTeX Warning: Reference `' on page 8 undefined on input line 120.
+Underfull \hbox (badness 2042) in paragraph at lines 3--52
+\OT1/ptm/m/n/10 tional Sci-ence and Tech-nol-ogy Ma-jor Project (No.
+ []
 
-
-LaTeX Warning: Reference `' on page 8 undefined on input line 126.
-
-
-LaTeX Warning: Reference `' on page 8 undefined on input line 127.
-
-) (./related.tex [8 <./figure/static-eps-converted-to.pdf>] [9]) (./conclusion.tex [10]) (./ack.tex) (./HSCS.bbl
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <8> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 5.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <5> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 5.
-
-./HSCS.bbl:26: Misplaced alignment tab character &.
-l.26 ...ternational Journal of Computer Networks &
+(./HSCS.bbl
+./HSCS.bbl:7: Misplaced alignment tab character &.
+l.7 ...nternational Journal of Computer Networks &
                                                    Communications 2},
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -533,13 +538,8 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-
-Underfull \hbox (badness 1708) in paragraph at lines 58--64
-[]\OT1/ptm/m/sc/8 Duato, J., Pena, A. J., Silla, F., Mayo, R., and
- []
-
-./HSCS.bbl:69: Misplaced alignment tab character &.
-l.69 ...tional Journal of Communications Network &
+./HSCS.bbl:24: Misplaced alignment tab character &.
+l.24 ...tional Journal of Communications Network &
                                                    System
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -549,12 +549,12 @@ you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
 
-Underfull \hbox (badness 3668) in paragraph at lines 104--108
+Underfull \hbox (badness 3668) in paragraph at lines 33--37
 []\OT1/ptm/m/sc/8 Huang, Q., Gud-munds-dot-tir, H., Vig-fusson, Y.,
  []
 
-./HSCS.bbl:120: Misplaced alignment tab character &.
-l.120 ...Trends in Information Telecommunication &
+./HSCS.bbl:41: Misplaced alignment tab character &.
+l.41 ... Trends in Information Telecommunication &
                                                   
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -563,22 +563,10 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-
-Underfull \hbox (badness 1163) in paragraph at lines 124--128
-[]\OT1/ptm/m/sc/8 Kivity, A., Ka-may, Y., Laor, D., Lublin, U., and
- []
-
 Missing character: There is no Ã in font ptmrc7t!
 Missing character: There is no © in font ptmrc7t!
-
-Overfull \vbox (1.32993pt too high) has occurred while \output is active []
-
-
-Overfull \vbox (17.59998pt too high) has occurred while \output is active []
-
- [11]
-./HSCS.bbl:151: Misplaced alignment tab character &.
-l.151 ...ternational Journal of Computer Science &
+./HSCS.bbl:53: Misplaced alignment tab character &.
+l.53 ...nternational Journal of Computer Science &
                                                    Engineering Survey
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
@@ -587,9 +575,9 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-./HSCS.bbl:186: Misplaced alignment tab character &.
-l.186 \newblock {\em Computer Science &
-                                        Information Systems 7}, 1 (2010), 15...
+./HSCS.bbl:76: Misplaced alignment tab character &.
+l.76 \newblock {\em Computer Science &
+                                       Information Systems 7}, 1 (2010), 153...
 I can't figure out why you would want to use a tab mark
 here. If you just want an ampersand, the remedy is
 simple: Just type `I\&' now. But if some right brace
@@ -597,24 +585,28 @@ up above has ended a previous alignment prematurely,
 you're probably due for more error messages, and you
 might try typing `S' now just to see what is salvageable.
 
-) [12] (./HSCS.aux)
+
+Package balance Warning: You have called \balance in second column
+(balance)                Columns might not be balanced.
+
+[11]) [12] (./HSCS.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 5491 strings out of 493014
- 81506 string characters out of 6133351
- 182892 words of memory out of 5000000
- 8856 multiletter control sequences out of 15000+600000
- 52819 words of font info for 103 fonts, out of 8000000 for 9000
+ 5484 strings out of 493014
+ 81487 string characters out of 6133351
+ 177872 words of memory out of 5000000
+ 8847 multiletter control sequences out of 15000+600000
+ 47779 words of font info for 91 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 38i,14n,39p,1231b,389s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2016/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on HSCS.pdf (12 pages, 359078 bytes).
+ 38i,14n,39p,3545b,389s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2016/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on HSCS.pdf (12 pages, 642292 bytes).
 PDF statistics:
- 107 PDF objects out of 1000 (max. 8388607)
- 64 compressed objects within 1 object stream
+ 109 PDF objects out of 1000 (max. 8388607)
+ 57 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 46 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 71 words of extra memory for PDF output out of 10000 (max. 10000000)
 

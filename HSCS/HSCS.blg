@@ -3,48 +3,44 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: HSCS.aux
 The style file: acm.bst
 Database file #1: HSCS.bib
-Warning--to sort, need author or key in website:vbox
-Warning--to sort, need author or key in website:nvidiagrid
-Warning--can't use both volume and number fields in humphreys2002chromium
-You've used 31 entries,
+You've used 14 entries,
             2253 wiz_defined-function locations,
-            709 strings with 10189 characters,
-and the built_in function-call counts, 12154 in all, are:
-= -- 1138
-> -- 650
+            620 strings with 6590 characters,
+and the built_in function-call counts, 4869 in all, are:
+= -- 443
+> -- 258
 < -- 0
-+ -- 276
-- -- 236
-* -- 957
-:= -- 1901
-add.period$ -- 92
-call.type$ -- 31
-change.case$ -- 209
++ -- 111
+- -- 92
+* -- 387
+:= -- 796
+add.period$ -- 42
+call.type$ -- 14
+change.case$ -- 87
 chr.to.int$ -- 0
-cite$ -- 34
-duplicate$ -- 465
-empty$ -- 941
-format.name$ -- 236
-if$ -- 2576
+cite$ -- 14
+duplicate$ -- 182
+empty$ -- 381
+format.name$ -- 92
+if$ -- 1021
 int.to.chr$ -- 0
-int.to.str$ -- 31
-missing$ -- 30
-newline$ -- 156
-num.names$ -- 58
-pop$ -- 249
+int.to.str$ -- 14
+missing$ -- 15
+newline$ -- 73
+num.names$ -- 28
+pop$ -- 95
 preamble$ -- 1
-purify$ -- 179
+purify$ -- 74
 quote$ -- 0
-skip$ -- 326
+skip$ -- 115
 stack$ -- 0
-substring$ -- 658
-swap$ -- 151
+substring$ -- 234
+swap$ -- 52
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 122
-warning$ -- 3
-while$ -- 104
-width$ -- 33
-write$ -- 311
-(There were 3 warnings)
+type$ -- 54
+warning$ -- 0
+while$ -- 40
+width$ -- 16
+write$ -- 138

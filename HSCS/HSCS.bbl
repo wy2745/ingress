@@ -1,24 +1,5 @@
 \begin{thebibliography}{10}
 
-\bibitem{website:nvidiagrid}
-Nvidia grid: Graphics-accelerated virtualization.
-\newblock \url{http://www.nvidia.com/object/grid-technology.html}.
-
-\bibitem{website:vbox}
-Oracle vm virtualbox.
-\newblock \url{https://www.virtualbox.org/}.
-
-\bibitem{adams2006comparison}
-{\sc Adams, K., and Agesen, O.}
-\newblock A comparison of software and hardware techniques for x86
-  virtualization.
-\newblock {\em ACM Sigplan Notices 41}, 11 (2006), 2--13.
-
-\bibitem{agesen2010evolution}
-{\sc Agesen, O., Garthwaite, A., Sheldon, J., and Subrahmanyam, P.}
-\newblock The evolution of an x86 virtual machine monitor.
-\newblock {\em ACM SIGOPS Operating Systems Review 44}, 4 (2010), 3--18.
-
 \bibitem{Ayyasamy2010A}
 {\sc Ayyasamy, S., and Sivanandam, S.~N.}
 \newblock A cluster based replication architecture for load balancing in
@@ -36,32 +17,6 @@ Oracle vm virtualbox.
 \newblock Dynamic load balancing of virtual machines using qemu-kvm.
 \newblock {\em International Journal of Computer Applications\/} (2012).
 
-\bibitem{deelman2005pegasus}
-{\sc Deelman, E., Singh, G., Su, M.-H., Blythe, J., Gil, Y., Kesselman, C.,
-  Mehta, G., Vahi, K., Berriman, G.~B., Good, J., et~al.}
-\newblock Pegasus: A framework for mapping complex scientific workflows onto
-  distributed systems.
-\newblock {\em Scientific Programming 13}, 3 (2005), 219--237.
-
-\bibitem{dong2009towards}
-{\sc Dong, Y., Dai, J., Huang, Z., Guan, H., Tian, K., and Jiang, Y.}
-\newblock Towards high-quality i/o virtualization.
-\newblock In {\em Proceedings of SYSTOR 2009: The Israeli Experimental Systems
-  Conference\/} (2009), ACM, p.~12.
-
-\bibitem{dowty2009gpu}
-{\sc Dowty, M., and Sugerman, J.}
-\newblock Gpu virtualization on vmware's hosted i/o architecture.
-\newblock {\em ACM SIGOPS Operating Systems Review 43}, 3 (2009), 73--82.
-
-\bibitem{duato2010rcuda}
-{\sc Duato, J., Pena, A.~J., Silla, F., Mayo, R., and Quintana-Ort{\'\i},
-  E.~S.}
-\newblock rcuda: Reducing the number of gpu-based accelerators in high
-  performance clusters.
-\newblock In {\em High Performance Computing and Simulation (HPCS), 2010
-  International Conference on\/} (2010), IEEE, pp.~224--231.
-
 \bibitem{Eludiora2010A}
 {\sc Eludiora, S., Abiona, O., Aderounmu, G., Oluwatope, A., Onime, C., and
   Kehinde, L.}
@@ -74,45 +29,11 @@ Oracle vm virtualbox.
 \newblock Energy efficient load balancing in web server clusters.
 \newblock In {\em International Teletraffic Congress\/} (2017), pp.~13--18.
 
-\bibitem{giunta2010gpgpu}
-{\sc Giunta, G., Montella, R., Agrillo, G., and Coviello, G.}
-\newblock A gpgpu transparent virtualization component for high performance
-  computing clouds.
-\newblock In {\em Euro-Par 2010-Parallel Processing}. Springer, 2010,
-  pp.~379--391.
-
-\bibitem{gottschlag2013logv}
-{\sc Gottschlag, M., Hillenbrand, M., Kehne, J., Stoess, J., and Bellosa, F.}
-\newblock Logv: Low-overhead gpgpu virtualization.
-\newblock In {\em High Performance Computing and Communications \& 2013 IEEE
-  International Conference on Embedded and Ubiquitous Computing (HPCC\_EUC),
-  2013 IEEE 10th International Conference on\/} (2013), IEEE, pp.~1721--1726.
-
-\bibitem{gupta2009gvim}
-{\sc Gupta, V., Gavrilovska, A., Schwan, K., Kharche, H., Tolia, N., Talwar,
-  V., and Ranganathan, P.}
-\newblock Gvim: Gpu-accelerated virtual machines.
-\newblock In {\em Proceedings of the 3rd ACM Workshop on System-level
-  Virtualization for High Performance Computing\/} (2009), ACM, pp.~17--24.
-
-\bibitem{hiremane2007intel}
-{\sc Hiremane, R.}
-\newblock Intel virtualization technology for directed i/o (intel vt-d).
-\newblock {\em Technology@ Intel Magazine 4}, 10 (2007).
-
 \bibitem{Huang2014Characterizing}
 {\sc Huang, Q., Gudmundsdottir, H., Vigfusson, Y., Freedman, D.~A., Birman, K.,
   and Renesse, R.~V.}
 \newblock Characterizing load imbalance in real-world networked caches.
 \newblock In {\em ACM Workshop on Hot Topics in Networks\/} (2014), p.~8.
-
-\bibitem{humphreys2002chromium}
-{\sc Humphreys, G., Houston, M., Ng, R., Frank, R., Ahern, S., Kirchner, P.~D.,
-  and Klosowski, J.~T.}
-\newblock Chromium: a stream-processing framework for interactive rendering on
-  clusters.
-\newblock In {\em ACM Transactions on Graphics (TOG)\/} (2002), vol.~21, ACM,
-  pp.~693--702.
 
 \bibitem{Kaur2014Load}
 {\sc Kaur, R., and Luthra, P.}
@@ -120,29 +41,10 @@ Oracle vm virtualbox.
 \newblock {\em Int.conf.on Recent Trends in Information Telecommunication &
   Computing Itc\/} (2014).
 
-\bibitem{kivity2007kvm}
-{\sc Kivity, A., Kamay, Y., Laor, D., Lublin, U., and Liguori, A.}
-\newblock kvm: the linux virtual machine monitor.
-\newblock In {\em Proceedings of the Linux Symposium\/} (2007), vol.~1,
-  pp.~225--230.
-
-\bibitem{lagar2007vmm}
-{\sc Lagar-Cavilla, H.~A., Tolia, N., Satyanarayanan, M., and De~Lara, E.}
-\newblock Vmm-independent graphics acceleration.
-\newblock In {\em Proceedings of the 3rd international conference on Virtual
-  execution environments\/} (2007), ACM, pp.~33--43.
-
 \bibitem{Menon2013A}
 {\sc Menon, H., and Kalé, L.}
 \newblock {\em A distributed dynamic load balancer for iterative applications}.
 \newblock IEEE, 2013.
-
-\bibitem{qi2014vgris}
-{\sc Qi, Z., Yao, J., Zhang, C., Yu, M., Yang, Z., and Guan, H.}
-\newblock Vgris: Virtualized gpu resource isolation and scheduling in cloud
-  gaming.
-\newblock {\em ACM Transactions on Architecture and Code Optimization (TACO)
-  11}, 2 (2014), 17.
 
 \bibitem{Sharma2011Framework}
 {\sc Sharma, D., and Saxena, A.~B.}
@@ -151,27 +53,15 @@ Oracle vm virtualbox.
 \newblock {\em International Journal of Computer Science & Engineering Survey
   2}, 1 (2011).
 
-\bibitem{shi2012vcuda}
-{\sc Shi, L., Chen, H., Sun, J., and Li, K.}
-\newblock vcuda: Gpu-accelerated high-performance computing in virtual
-  machines.
-\newblock {\em Computers, IEEE Transactions on 61}, 6 (2012), 804--816.
-
-\bibitem{suzuki2014gpuvm}
-{\sc Suzuki, Y., Kato, S., Yamada, H., and Kono, K.}
-\newblock Gpuvm: why not virtualizing gpus at the hypervisor?
-\newblock In {\em Proceedings of the 2014 USENIX conference on USENIX Annual
-  Technical Conference\/} (2014), USENIX Association, pp.~109--120.
-
-\bibitem{tian2014full}
-{\sc Tian, K., Dong, Y., and Cowperthwaite, D.}
-\newblock A full gpu virtualization solution with mediated pass-through.
-\newblock In {\em Proc. USENIX ATC\/} (2014).
-
 \bibitem{Velusamy2017Smart}
 {\sc Velusamy, G., and Lent, R.}
 \newblock Smart load-balancer for web applications.
 \newblock In {\em International Conference\/} (2017), pp.~19--26.
+
+\bibitem{Wilkes2016Borg}
+{\sc Wilkes, J., Wilkes, J., Wilkes, J., Wilkes, J., and Wilkes, J.}
+\newblock Borg, omega, and kubernetes.
+\newblock {\em Communications of the Acm 59}, 5 (2016), 50--57.
 
 \bibitem{Xu2014A}
 {\sc Xu, Z., and Wang, X.}
@@ -184,5 +74,10 @@ Oracle vm virtualbox.
 \newblock A content-based dynamic load-balancing algorithm for heterogeneous
   web server cluster.
 \newblock {\em Computer Science & Information Systems 7}, 1 (2010), 153--162.
+
+\bibitem{Zhao2018Locality}
+{\sc Zhao, D., Mohamed, M., and Ludwig, H.}
+\newblock Locality-aware scheduling for containers in cloud computing.
+\newblock {\em IEEE Transactions on Cloud Computing PP}, 99 (2018), 1--1.
 
 \end{thebibliography}
